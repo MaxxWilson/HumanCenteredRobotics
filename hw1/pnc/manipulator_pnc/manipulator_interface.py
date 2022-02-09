@@ -41,9 +41,9 @@ class ManipulatorInterface(Interface):
             sensor_data["joint_vel"])
 
         # TODO: Question 2
-        # jtrq_cmd = self._compute_jpos_command()
+        jtrq_cmd = self._compute_jpos_command()
         # TODO: Question 3
-        jtrq_cmd = self._compute_osc_command()
+        # jtrq_cmd = self._compute_osc_command()
         # TODO: Question 4
         # jtrq_cmd = self._compute_wbc_command()
 
@@ -75,9 +75,14 @@ class ManipulatorInterface(Interface):
 
         # initialize
         jtrq = np.zeros(self._robot.n_a)
-        kp = 100
-        kd = 20
-        q_des = np.array([[0], [1.57], [0]])
+
+        # Set PD Gains for each joint
+        kp = np.array([6.0, 5.0, 3.0])
+        kd = np.array([10.0, 5.0, 3.0])
+        q_des = np.array([0.35, 1.57, 0.35])
+        q_dot_des = np.array([0, 0, 0])
+
+        jtrq = kp * (q_des - self._robot.get_q()) + kd * (q_dot_des - self._robot.get_q_dot())
 
         return jtrq
 
