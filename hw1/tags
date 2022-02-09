@@ -1,0 +1,259 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+Adjoint	util/liegroup.py	/^def Adjoint(T):$/;"	f
+Ag	pnc/robot_system/robot_system.py	/^    def Ag(self):$/;"	m	class:RobotSystem
+AtlasStateProvider	pnc/state_machine.py	/^from pnc.atlas_pnc.atlas_state_provider import AtlasStateProvider$/;"	i
+AxisAng3	util/liegroup.py	/^def AxisAng3(expc3):$/;"	f
+AxisAng6	util/liegroup.py	/^def AxisAng6(expc6):$/;"	f
+ControlArchitecture	pnc/control_architecture.py	/^class ControlArchitecture(abc.ABC):$/;"	c
+DES_EE_POS	config/manipulator_config.py	/^    DES_EE_POS = np.array([1., 2., 0.])$/;"	v	class:ManipulatorConfig
+DT	config/manipulator_config.py	/^    DT = 0.01$/;"	v	class:ManipulatorConfig
+DYN_LIB	config/manipulator_config.py	/^    DYN_LIB = "pinocchio"  # "dart"$/;"	v	class:ManipulatorConfig
+DataSaver	pnc/data_saver.py	/^class DataSaver(metaclass=MetaSingleton):$/;"	c
+DistanceToSE3	util/liegroup.py	/^def DistanceToSE3(mat):$/;"	f
+DistanceToSO3	util/liegroup.py	/^def DistanceToSO3(mat):$/;"	f
+HermiteCurve	util/util.py	/^class HermiteCurve(object):$/;"	c
+HermiteCurveQuat	util/util.py	/^class HermiteCurveQuat(object):$/;"	c
+HermiteCurveVec	util/util.py	/^class HermiteCurveVec(object):$/;"	c
+Ig	pnc/robot_system/robot_system.py	/^    def Ig(self):$/;"	m	class:RobotSystem
+Interface	pnc/interface.py	/^class Interface(abc.ABC):$/;"	c
+Interface	pnc/manipulator_pnc/manipulator_interface.py	/^from pnc.interface import Interface$/;"	i
+Jg	pnc/robot_system/robot_system.py	/^    def Jg(self):$/;"	m	class:RobotSystem
+KD	config/manipulator_config.py	/^    KD = 4.0$/;"	v	class:ManipulatorConfig
+KP	config/manipulator_config.py	/^    KP = 4.0$/;"	v	class:ManipulatorConfig
+ManipulatorConfig	config/manipulator_config.py	/^class ManipulatorConfig(object):$/;"	c
+ManipulatorConfig	pnc/manipulator_pnc/manipulator_interface.py	/^from config.manipulator_config import ManipulatorConfig$/;"	i
+ManipulatorConfig	simulator/pybullet/manipulator_main.py	/^from config.manipulator_config import ManipulatorConfig$/;"	i
+ManipulatorConfig	simulator/pybullet/manipulator_main_with_meshcat.py	/^from config.manipulator_config import ManipulatorConfig$/;"	i
+ManipulatorInterface	pnc/manipulator_pnc/manipulator_interface.py	/^class ManipulatorInterface(Interface):$/;"	c
+ManipulatorInterface	simulator/pybullet/manipulator_main.py	/^from pnc.manipulator_pnc.manipulator_interface import ManipulatorInterface$/;"	i
+ManipulatorInterface	simulator/pybullet/manipulator_main_with_meshcat.py	/^from pnc.manipulator_pnc.manipulator_interface import ManipulatorInterface$/;"	i
+MatrixExp3	util/liegroup.py	/^def MatrixExp3(so3mat):$/;"	f
+MatrixExp6	util/liegroup.py	/^def MatrixExp6(se3mat):$/;"	f
+MatrixLog3	util/liegroup.py	/^def MatrixLog3(R):$/;"	f
+MatrixLog6	util/liegroup.py	/^def MatrixLog6(T):$/;"	f
+MeshcatVisualizer	simulator/pybullet/manipulator_main_with_meshcat.py	/^from pinocchio.visualize import MeshcatVisualizer$/;"	i
+MetaSingleton	pnc/data_saver.py	/^class MetaSingleton(type):$/;"	c
+N_SUBSTEP	config/manipulator_config.py	/^    N_SUBSTEP = 1$/;"	v	class:ManipulatorConfig
+NearZero	util/liegroup.py	/^def NearZero(z):$/;"	f
+Normalize	util/liegroup.py	/^def Normalize(V):$/;"	f
+OrderedDict	pnc/control_architecture.py	/^from collections import OrderedDict$/;"	i
+OrderedDict	pnc/robot_system/pinocchio_robot_system.py	/^from collections import OrderedDict$/;"	i
+OrderedDict	pnc/robot_system/robot_system.py	/^from collections import OrderedDict$/;"	i
+OrderedDict	simulator/pybullet/manipulator_main.py	/^from collections import OrderedDict$/;"	i
+OrderedDict	simulator/pybullet/manipulator_main_with_meshcat.py	/^from collections import OrderedDict$/;"	i
+OrderedDict	util/pybullet_util.py	/^from collections import OrderedDict$/;"	i
+OrderedDict	util/util.py	/^from collections import OrderedDict$/;"	i
+PRINT_ROBOT_INFO	config/manipulator_config.py	/^    PRINT_ROBOT_INFO = True$/;"	v	class:ManipulatorConfig
+PinocchioRobotSystem	pnc/manipulator_pnc/manipulator_interface.py	/^from pnc.robot_system.pinocchio_robot_system import PinocchioRobotSystem$/;"	i
+PinocchioRobotSystem	pnc/robot_system/pinocchio_robot_system.py	/^class PinocchioRobotSystem(RobotSystem):$/;"	c
+ProjectToSE3	util/liegroup.py	/^def ProjectToSE3(mat):$/;"	f
+ProjectToSO3	util/liegroup.py	/^def ProjectToSO3(mat):$/;"	f
+R	util/util.py	/^from scipy.spatial.transform import Rotation as R$/;"	i
+RobotSystem	pnc/robot_system/pinocchio_robot_system.py	/^from pnc.robot_system.robot_system import RobotSystem$/;"	i
+RobotSystem	pnc/robot_system/robot_system.py	/^class RobotSystem(abc.ABC):$/;"	c
+RotInv	util/liegroup.py	/^def RotInv(R):$/;"	f
+RpToTrans	util/liegroup.py	/^def RpToTrans(R, p):$/;"	f
+ScrewToAxis	util/liegroup.py	/^def ScrewToAxis(q, s, h):$/;"	f
+StateMachine	pnc/state_machine.py	/^class StateMachine(abc.ABC):$/;"	c
+TaskForceContainer	pnc/task_force_container.py	/^class TaskForceContainer(abc.ABC):$/;"	c
+TestIfSE3	util/liegroup.py	/^def TestIfSE3(mat):$/;"	f
+TestIfSO3	util/liegroup.py	/^def TestIfSO3(mat):$/;"	f
+TransInv	util/liegroup.py	/^def TransInv(T):$/;"	f
+TransToRp	util/liegroup.py	/^def TransToRp(T):$/;"	f
+VIDEO_RECORD	config/manipulator_config.py	/^    VIDEO_RECORD = False$/;"	v	class:ManipulatorConfig
+VecTose3	util/liegroup.py	/^def VecTose3(V):$/;"	f
+VecToso3	util/liegroup.py	/^def VecToso3(omg):$/;"	f
+__call__	pnc/data_saver.py	/^    def __call__(cls, *args, **kwargs):$/;"	m	class:MetaSingleton	file:
+__init__	pnc/control_architecture.py	/^    def __init__(self, robot):$/;"	m	class:ControlArchitecture
+__init__	pnc/data_saver.py	/^    def __init__(self):$/;"	m	class:DataSaver
+__init__	pnc/interface.py	/^    def __init__(self):$/;"	m	class:Interface
+__init__	pnc/manipulator_pnc/manipulator_interface.py	/^    def __init__(self):$/;"	m	class:ManipulatorInterface
+__init__	pnc/robot_system/pinocchio_robot_system.py	/^    def __init__(self,$/;"	m	class:PinocchioRobotSystem
+__init__	pnc/robot_system/robot_system.py	/^    def __init__(self,$/;"	m	class:RobotSystem
+__init__	pnc/state_machine.py	/^    def __init__(self, state_id, robot):$/;"	m	class:StateMachine
+__init__	pnc/task_force_container.py	/^    def __init__(self, robot):$/;"	m	class:TaskForceContainer
+__init__	util/util.py	/^    def __init__(self, quat_start, ang_vel_start, quat_end, ang_vel_end):$/;"	m	class:HermiteCurveQuat
+__init__	util/util.py	/^    def __init__(self, start_pos, start_vel, end_pos, end_vel):$/;"	m	class:HermiteCurve
+__init__	util/util.py	/^    def __init__(self, start_pos, start_vel, end_pos, end_vel):$/;"	m	class:HermiteCurveVec
+_compute_basis	util/util.py	/^    def _compute_basis(self, s_in):$/;"	m	class:HermiteCurveQuat
+_compute_osc_command	pnc/manipulator_pnc/manipulator_interface.py	/^    def _compute_osc_command(self):$/;"	m	class:ManipulatorInterface
+_config_robot	pnc/robot_system/pinocchio_robot_system.py	/^    def _config_robot(self, urdf_file, package_dir):$/;"	m	class:PinocchioRobotSystem
+_config_robot	pnc/robot_system/robot_system.py	/^    def _config_robot(self, urdf_file):$/;"	m	class:RobotSystem
+_instances	pnc/data_saver.py	/^    _instances = {}$/;"	v	class:MetaSingleton
+_update_centroidal_quantities	pnc/robot_system/pinocchio_robot_system.py	/^    def _update_centroidal_quantities(self):$/;"	m	class:PinocchioRobotSystem
+_update_centroidal_quantities	pnc/robot_system/robot_system.py	/^    def _update_centroidal_quantities(self):$/;"	m	class:RobotSystem
+abc	pnc/control_architecture.py	/^import abc$/;"	i
+abc	pnc/interface.py	/^import abc$/;"	i
+abc	pnc/robot_system/robot_system.py	/^import abc$/;"	i
+abc	pnc/state_machine.py	/^import abc$/;"	i
+abc	pnc/task_force_container.py	/^import abc$/;"	i
+add	pnc/data_saver.py	/^    def add(self, key, value):$/;"	m	class:DataSaver
+adjoint	util/util.py	/^def adjoint(T):$/;"	f
+advance	pnc/data_saver.py	/^    def advance(self):$/;"	m	class:DataSaver
+cameraPitch	simulator/pybullet/manipulator_main.py	/^                                 cameraPitch=-45,$/;"	v
+cameraTargetPosition	simulator/pybullet/manipulator_main.py	/^                                 cameraTargetPosition=[1.5, 0., 0.])$/;"	v
+cameraYaw	simulator/pybullet/manipulator_main.py	/^                                 cameraYaw=0,$/;"	v
+close	pnc/data_saver.py	/^    def close(self):$/;"	m	class:DataSaver
+command	simulator/pybullet/manipulator_main.py	/^        command = interface.get_command(sensor_data)$/;"	v
+command	simulator/pybullet/manipulator_main_with_meshcat.py	/^        command = interface.get_command(sensor_data)$/;"	v
+count	simulator/pybullet/manipulator_main.py	/^    count = 0$/;"	v
+count	simulator/pybullet/manipulator_main_with_meshcat.py	/^    count = 0$/;"	v
+create_cmd_ordered_dict	pnc/robot_system/pinocchio_robot_system.py	/^    def create_cmd_ordered_dict(self, joint_pos_cmd, joint_vel_cmd,$/;"	m	class:PinocchioRobotSystem
+create_cmd_ordered_dict	pnc/robot_system/robot_system.py	/^    def create_cmd_ordered_dict(self, joint_pos_cmd, joint_vel_cmd,$/;"	m	class:RobotSystem
+cwd	pnc/manipulator_pnc/manipulator_interface.py	/^cwd = os.getcwd()$/;"	v
+cwd	pnc/robot_system/pinocchio_robot_system.py	/^cwd = os.getcwd()$/;"	v
+cwd	simulator/pybullet/manipulator_main.py	/^cwd = os.getcwd()$/;"	v
+cwd	simulator/pybullet/manipulator_main_with_meshcat.py	/^cwd = os.getcwd()$/;"	v
+dt	simulator/pybullet/manipulator_main.py	/^    dt = ManipulatorConfig.DT$/;"	v
+dt	simulator/pybullet/manipulator_main_with_meshcat.py	/^    dt = ManipulatorConfig.DT$/;"	v
+end_of_state	pnc/state_machine.py	/^    def end_of_state(self):$/;"	m	class:StateMachine
+euler_to_rot	util/util.py	/^def euler_to_rot(angles):$/;"	f
+evaluate	util/util.py	/^    def evaluate(self, s_in):$/;"	m	class:HermiteCurve
+evaluate	util/util.py	/^    def evaluate(self, s_in):$/;"	m	class:HermiteCurveQuat
+evaluate	util/util.py	/^    def evaluate(self, s_in):$/;"	m	class:HermiteCurveVec
+evaluate_ang_acc	util/util.py	/^    def evaluate_ang_acc(self, s_in):$/;"	m	class:HermiteCurveQuat
+evaluate_ang_vel	util/util.py	/^    def evaluate_ang_vel(self, s_in):$/;"	m	class:HermiteCurveQuat
+evaluate_first_derivative	util/util.py	/^    def evaluate_first_derivative(self, s_in):$/;"	m	class:HermiteCurve
+evaluate_first_derivative	util/util.py	/^    def evaluate_first_derivative(self, s_in):$/;"	m	class:HermiteCurveVec
+evaluate_second_derivative	util/util.py	/^    def evaluate_second_derivative(self, s_in):$/;"	m	class:HermiteCurve
+evaluate_second_derivative	util/util.py	/^    def evaluate_second_derivative(self, s_in):$/;"	m	class:HermiteCurveVec
+exp_to_quat	util/util.py	/^def exp_to_quat(exp):$/;"	f
+first_visit	pnc/state_machine.py	/^    def first_visit(self):$/;"	m	class:StateMachine
+get_alpha_from_frequency	util/util.py	/^def get_alpha_from_frequency(hz, dt):$/;"	f
+get_camera_image	util/pybullet_util.py	/^def get_camera_image(robot, link_id, projection_matrix):$/;"	f
+get_com_lin_jacobian	pnc/robot_system/pinocchio_robot_system.py	/^    def get_com_lin_jacobian(self):$/;"	m	class:PinocchioRobotSystem
+get_com_lin_jacobian	pnc/robot_system/robot_system.py	/^    def get_com_lin_jacobian(self):$/;"	m	class:RobotSystem
+get_com_lin_jacobian_dot	pnc/robot_system/pinocchio_robot_system.py	/^    def get_com_lin_jacobian_dot(self):$/;"	m	class:PinocchioRobotSystem
+get_com_lin_jacobian_dot	pnc/robot_system/robot_system.py	/^    def get_com_lin_jacobian_dot(self):$/;"	m	class:RobotSystem
+get_com_lin_vel	pnc/robot_system/pinocchio_robot_system.py	/^    def get_com_lin_vel(self):$/;"	m	class:PinocchioRobotSystem
+get_com_lin_vel	pnc/robot_system/robot_system.py	/^    def get_com_lin_vel(self):$/;"	m	class:RobotSystem
+get_com_pos	pnc/robot_system/pinocchio_robot_system.py	/^    def get_com_pos(self):$/;"	m	class:PinocchioRobotSystem
+get_com_pos	pnc/robot_system/robot_system.py	/^    def get_com_pos(self):$/;"	m	class:RobotSystem
+get_command	pnc/control_architecture.py	/^    def get_command(self):$/;"	m	class:ControlArchitecture
+get_command	pnc/interface.py	/^    def get_command(self, sensor_data):$/;"	m	class:Interface
+get_command	pnc/manipulator_pnc/manipulator_interface.py	/^    def get_command(self, sensor_data):$/;"	m	class:ManipulatorInterface
+get_coriolis	pnc/robot_system/pinocchio_robot_system.py	/^    def get_coriolis(self):$/;"	m	class:PinocchioRobotSystem
+get_coriolis	pnc/robot_system/robot_system.py	/^    def get_coriolis(self):$/;"	m	class:RobotSystem
+get_gravity	pnc/robot_system/pinocchio_robot_system.py	/^    def get_gravity(self):$/;"	m	class:PinocchioRobotSystem
+get_gravity	pnc/robot_system/robot_system.py	/^    def get_gravity(self):$/;"	m	class:RobotSystem
+get_joint_idx	pnc/robot_system/pinocchio_robot_system.py	/^    def get_joint_idx(self, joint_id):$/;"	m	class:PinocchioRobotSystem
+get_joint_idx	pnc/robot_system/robot_system.py	/^    def get_joint_idx(self, joint_id):$/;"	m	class:RobotSystem
+get_kinematics_config	util/pybullet_util.py	/^def get_kinematics_config(robot, joint_id, link_id, open_chain_joints,$/;"	f
+get_link_iso	pnc/robot_system/pinocchio_robot_system.py	/^    def get_link_iso(self, link_id):$/;"	m	class:PinocchioRobotSystem
+get_link_iso	pnc/robot_system/robot_system.py	/^    def get_link_iso(self, link_id):$/;"	m	class:RobotSystem
+get_link_iso	util/pybullet_util.py	/^def get_link_iso(robot, link_idx):$/;"	f
+get_link_jacobian	pnc/robot_system/pinocchio_robot_system.py	/^    def get_link_jacobian(self, link_id):$/;"	m	class:PinocchioRobotSystem
+get_link_jacobian	pnc/robot_system/robot_system.py	/^    def get_link_jacobian(self, link_id):$/;"	m	class:RobotSystem
+get_link_jacobian_dot_times_qdot	pnc/robot_system/pinocchio_robot_system.py	/^    def get_link_jacobian_dot_times_qdot(self, link_id):$/;"	m	class:PinocchioRobotSystem
+get_link_jacobian_dot_times_qdot	pnc/robot_system/robot_system.py	/^    def get_link_jacobian_dot_times_qdot(self, link_id):$/;"	m	class:RobotSystem
+get_link_vel	pnc/robot_system/pinocchio_robot_system.py	/^    def get_link_vel(self, link_id):$/;"	m	class:PinocchioRobotSystem
+get_link_vel	pnc/robot_system/robot_system.py	/^    def get_link_vel(self, link_id):$/;"	m	class:RobotSystem
+get_link_vel	util/pybullet_util.py	/^def get_link_vel(robot, link_idx):$/;"	f
+get_mass_matrix	pnc/robot_system/pinocchio_robot_system.py	/^    def get_mass_matrix(self):$/;"	m	class:PinocchioRobotSystem
+get_mass_matrix	pnc/robot_system/robot_system.py	/^    def get_mass_matrix(self):$/;"	m	class:RobotSystem
+get_next_state	pnc/state_machine.py	/^    def get_next_state(self):$/;"	m	class:StateMachine
+get_q	pnc/robot_system/pinocchio_robot_system.py	/^    def get_q(self):$/;"	m	class:PinocchioRobotSystem
+get_q	pnc/robot_system/robot_system.py	/^    def get_q(self):$/;"	m	class:RobotSystem
+get_q_dot	pnc/robot_system/pinocchio_robot_system.py	/^    def get_q_dot(self):$/;"	m	class:PinocchioRobotSystem
+get_q_dot	pnc/robot_system/robot_system.py	/^    def get_q_dot(self):$/;"	m	class:RobotSystem
+get_q_dot_idx	pnc/robot_system/pinocchio_robot_system.py	/^    def get_q_dot_idx(self, joint_id):$/;"	m	class:PinocchioRobotSystem
+get_q_dot_idx	pnc/robot_system/robot_system.py	/^    def get_q_dot_idx(self, joint_id):$/;"	m	class:RobotSystem
+get_q_idx	pnc/robot_system/pinocchio_robot_system.py	/^    def get_q_idx(self, joint_id):$/;"	m	class:PinocchioRobotSystem
+get_q_idx	pnc/robot_system/robot_system.py	/^    def get_q_idx(self, joint_id):$/;"	m	class:RobotSystem
+get_robot_config	util/pybullet_util.py	/^def get_robot_config(robot,$/;"	f
+get_sensor_data	util/pybullet_util.py	/^def get_sensor_data(robot, joint_id, link_id, pos_basejoint_to_basecom,$/;"	f
+hg	pnc/robot_system/robot_system.py	/^    def hg(self):$/;"	m	class:RobotSystem
+interface	simulator/pybullet/manipulator_main.py	/^    interface = ManipulatorInterface()$/;"	v
+interface	simulator/pybullet/manipulator_main_with_meshcat.py	/^    interface = ManipulatorInterface()$/;"	v
+is_key_triggered	util/pybullet_util.py	/^def is_key_triggered(keys, key):$/;"	f
+iso_inv	util/util.py	/^def iso_inv(T):$/;"	f
+joint_id	pnc/robot_system/robot_system.py	/^    def joint_id(self):$/;"	m	class:RobotSystem
+joint_pos_limit	pnc/robot_system/robot_system.py	/^    def joint_pos_limit(self):$/;"	m	class:RobotSystem
+joint_positions	pnc/robot_system/robot_system.py	/^    def joint_positions(self):$/;"	m	class:RobotSystem
+joint_trq_limit	pnc/robot_system/robot_system.py	/^    def joint_trq_limit(self):$/;"	m	class:RobotSystem
+joint_vel_limit	pnc/robot_system/robot_system.py	/^    def joint_vel_limit(self):$/;"	m	class:RobotSystem
+joint_velocities	pnc/robot_system/robot_system.py	/^    def joint_velocities(self):$/;"	m	class:RobotSystem
+json	util/util.py	/^import json$/;"	i
+last_visit	pnc/state_machine.py	/^    def last_visit(self):$/;"	m	class:StateMachine
+liegroup	pnc/robot_system/pinocchio_robot_system.py	/^from util import liegroup$/;"	i
+liegroup	util/pybullet_util.py	/^from util import liegroup$/;"	i
+link_id	pnc/robot_system/robot_system.py	/^    def link_id(self):$/;"	m	class:RobotSystem
+math	pnc/manipulator_pnc/manipulator_interface.py	/^import time, math$/;"	i
+math	pnc/robot_system/pinocchio_robot_system.py	/^import time, math$/;"	i
+math	simulator/pybullet/manipulator_main.py	/^import time, math$/;"	i
+math	simulator/pybullet/manipulator_main_with_meshcat.py	/^import time, math$/;"	i
+n_a	pnc/robot_system/robot_system.py	/^    def n_a(self):$/;"	m	class:RobotSystem
+n_floating	pnc/robot_system/robot_system.py	/^    def n_floating(self):$/;"	m	class:RobotSystem
+n_q	pnc/robot_system/robot_system.py	/^    def n_q(self):$/;"	m	class:RobotSystem
+n_q_dot	pnc/robot_system/robot_system.py	/^    def n_q_dot(self):$/;"	m	class:RobotSystem
+np	config/manipulator_config.py	/^import numpy as np$/;"	i
+np	pnc/data_saver.py	/^import numpy as np$/;"	i
+np	pnc/manipulator_pnc/manipulator_interface.py	/^import numpy as np$/;"	i
+np	pnc/robot_system/pinocchio_robot_system.py	/^import numpy as np$/;"	i
+np	pnc/robot_system/robot_system.py	/^import numpy as np$/;"	i
+np	simulator/pybullet/manipulator_main.py	/^import numpy as np$/;"	i
+np	simulator/pybullet/manipulator_main_with_meshcat.py	/^import numpy as np$/;"	i
+np	util/liegroup.py	/^import numpy as np$/;"	i
+np	util/pybullet_util.py	/^import numpy as np$/;"	i
+np	util/util.py	/^import numpy as np$/;"	i
+numSubSteps	simulator/pybullet/manipulator_main.py	/^                                numSubSteps=ManipulatorConfig.N_SUBSTEP)$/;"	v
+numSubSteps	simulator/pybullet/manipulator_main_with_meshcat.py	/^                                numSubSteps=ManipulatorConfig.N_SUBSTEP)$/;"	v
+one_step	pnc/state_machine.py	/^    def one_step(self):$/;"	m	class:StateMachine
+os	pnc/data_saver.py	/^import os$/;"	i
+os	pnc/manipulator_pnc/manipulator_interface.py	/^import os$/;"	i
+os	pnc/robot_system/pinocchio_robot_system.py	/^import os$/;"	i
+os	simulator/pybullet/manipulator_main.py	/^import os$/;"	i
+os	simulator/pybullet/manipulator_main_with_meshcat.py	/^import os$/;"	i
+p	simulator/pybullet/manipulator_main.py	/^import pybullet as p$/;"	i
+p	simulator/pybullet/manipulator_main_with_meshcat.py	/^import pybullet as p$/;"	i
+p	util/pybullet_util.py	/^import pybullet as p$/;"	i
+pickle	pnc/data_saver.py	/^import pickle$/;"	i
+pin	pnc/robot_system/pinocchio_robot_system.py	/^import pinocchio as pin$/;"	i
+pin	simulator/pybullet/manipulator_main_with_meshcat.py	/^import pinocchio as pin$/;"	i
+pretty_print	util/util.py	/^def pretty_print(ob):$/;"	f
+prev_state	pnc/control_architecture.py	/^    def prev_state(self):$/;"	m	class:ControlArchitecture
+print_attrs	util/util.py	/^def print_attrs(ob):$/;"	f
+pybullet_util	simulator/pybullet/manipulator_main.py	/^from util import pybullet_util$/;"	i
+pybullet_util	simulator/pybullet/manipulator_main_with_meshcat.py	/^from util import pybullet_util$/;"	i
+quat_to_exp	util/util.py	/^def quat_to_exp(quat):$/;"	f
+quat_to_rot	util/util.py	/^def quat_to_rot(quat):$/;"	f
+robot	simulator/pybullet/manipulator_main.py	/^    robot = p.loadURDF(cwd +$/;"	v
+robot	simulator/pybullet/manipulator_main_with_meshcat.py	/^    robot = p.loadURDF(cwd +$/;"	v
+rot_to_quat	util/util.py	/^def rot_to_quat(rot):$/;"	f
+se3ToVec	util/liegroup.py	/^def se3ToVec(se3mat):$/;"	f
+sensor_data	simulator/pybullet/manipulator_main.py	/^        sensor_data = pybullet_util.get_sensor_data(robot, joint_id, link_id,$/;"	v
+sensor_data	simulator/pybullet/manipulator_main_with_meshcat.py	/^        sensor_data = pybullet_util.get_sensor_data(robot, joint_id, link_id,$/;"	v
+set_joint_friction	util/pybullet_util.py	/^def set_joint_friction(robot, joint_id, max_force=0):$/;"	f
+set_motor_trq	util/pybullet_util.py	/^def set_motor_trq(robot, joint_id, command):$/;"	f
+smooth_changing	util/util.py	/^def smooth_changing(ini, end, dur, curr_time):$/;"	f
+smooth_changing_acc	util/util.py	/^def smooth_changing_acc(ini, end, dur, curr_time):$/;"	f
+smooth_changing_vel	util/util.py	/^def smooth_changing_vel(ini, end, dur, curr_time):$/;"	f
+so3ToVec	util/liegroup.py	/^def so3ToVec(so3mat):$/;"	f
+state	pnc/control_architecture.py	/^    def state(self):$/;"	m	class:ControlArchitecture
+state_id	pnc/state_machine.py	/^    def state_id(self):$/;"	m	class:StateMachine
+sys	pnc/manipulator_pnc/manipulator_interface.py	/^import sys$/;"	i
+sys	pnc/robot_system/pinocchio_robot_system.py	/^import sys$/;"	i
+sys	simulator/pybullet/manipulator_main.py	/^import sys$/;"	i
+sys	simulator/pybullet/manipulator_main_with_meshcat.py	/^import sys$/;"	i
+t	simulator/pybullet/manipulator_main.py	/^    t = 0$/;"	v
+t	simulator/pybullet/manipulator_main_with_meshcat.py	/^    t = 0$/;"	v
+time	pnc/manipulator_pnc/manipulator_interface.py	/^import time, math$/;"	i
+time	pnc/robot_system/pinocchio_robot_system.py	/^import time, math$/;"	i
+time	simulator/pybullet/manipulator_main.py	/^import time, math$/;"	i
+time	simulator/pybullet/manipulator_main_with_meshcat.py	/^import time, math$/;"	i
+total_mass	pnc/robot_system/robot_system.py	/^    def total_mass(self):$/;"	m	class:RobotSystem
+update_system	pnc/robot_system/pinocchio_robot_system.py	/^    def update_system(self,$/;"	m	class:PinocchioRobotSystem
+update_system	pnc/robot_system/robot_system.py	/^    def update_system(self,$/;"	m	class:RobotSystem
+useFixedBase	simulator/pybullet/manipulator_main.py	/^                       useFixedBase=True)$/;"	v
+useFixedBase	simulator/pybullet/manipulator_main_with_meshcat.py	/^                       useFixedBase=True)$/;"	v
+util	config/manipulator_config.py	/^from util import util$/;"	i
+util	pnc/robot_system/pinocchio_robot_system.py	/^from util import util$/;"	i
+util	pnc/robot_system/robot_system.py	/^from util import util as util$/;"	i
+util	util/pybullet_util.py	/^from util import util$/;"	i
+vis_q	simulator/pybullet/manipulator_main_with_meshcat.py	/^    vis_q = pin.neutral(model)$/;"	v
+viz	simulator/pybullet/manipulator_main_with_meshcat.py	/^    viz = MeshcatVisualizer(model, collision_model, visual_model)$/;"	v
