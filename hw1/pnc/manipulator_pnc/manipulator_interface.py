@@ -11,6 +11,8 @@ import numpy as np
 from pnc.interface import Interface
 from config.manipulator_config import ManipulatorConfig
 
+from typing import Tuple
+import matplotlib.pyplot as plt
 
 class ManipulatorInterface(Interface):
     def __init__(self):
@@ -73,16 +75,23 @@ class ManipulatorInterface(Interface):
 
     def _compute_jpos_command(self):
 
+        q_des = np.array([0.35, 1.57, 0.35])
+        q_vel_des = np.array([0, 0, 0])
+
+        if(self._count == 0):
+            q = self._robot.get_q()
+            q_dot = self._robot.get_q_dot()
+            traject = self._compute_cubic_trajectory((q[0], q_des[0]), (q_dot[0], q_vel_des[0]), (0, 5))
+            # plt.plot(traject[0, :], traject[1, :])
+
         # initialize
         jtrq = np.zeros(self._robot.n_a)
 
         # Set PD Gains for each joint
         kp = np.array([6.0, 5.0, 3.0])
         kd = np.array([10.0, 5.0, 3.0])
-        q_des = np.array([0.35, 1.57, 0.35])
-        q_dot_des = np.array([0, 0, 0])
 
-        jtrq = kp * (q_des - self._robot.get_q()) + kd * (q_dot_des - self._robot.get_q_dot())
+        jtrq = kp * (q_des - self._robot.get_q()) + kd * (q_vel_des - self._robot.get_q_dot())
 
         return jtrq
 
@@ -94,3 +103,22 @@ class ManipulatorInterface(Interface):
         xosc_des = np.array([1, 1, 1.57])
 
         return jtrq
+
+    def _compute_cubic_trajectory(self, q: Tuple[float, float], q_dot: Tuple[float, float], t: Tuple[float, float]) -> np.ndarray:
+
+        inv = np.linalg.inv(np.array([
+            [t[0]**3,       t[0]**2,    t[0],   1],
+            [t[1]**3,       t[1]**2,    t[1],   1],
+            [3*t[0]**2,     2*t[0],     1,      0], 
+            [3*t[1]**2,     2*t[1],     1,      0]]))
+
+        [a, b, c, d] = inv @ np.transpose(np.array([q[0], q[1], q_dot[0], q_dot[1]]))
+        timestamps = np.arange(t[0], t[1] + ManipulatorConfig.DT, ManipulatorConfig.DT)
+        
+        trajectory = np.array([
+            timestamps,
+            a*timestamps**3 + b*timestamps**2 + c*timestamps + d,
+            3*a*timestamps**2 + 2*b*timestamps + c,
+            6*a*timestamps + 2*b])
+
+        return trajectory
