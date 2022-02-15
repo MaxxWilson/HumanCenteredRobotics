@@ -83,7 +83,7 @@ class ManipulatorInterface(Interface):
 
     def _compute_jpos_command(self):
 
-        q_des = np.array([-np.pi / 6., np.pi / 6., 0.])
+        q_des = np.array([0.35, 1.57, 0.35])
         q_vel_des = np.array([0, 0, 0])
 
         # On first run, compute desired trajectory given start and end conditions for each joint
@@ -95,17 +95,12 @@ class ManipulatorInterface(Interface):
             self.planned_traject["j2"] = self._compute_cubic_trajectory((q[1], q_des[1]), (q_dot[1], q_vel_des[1]), t_range)
             self.planned_traject["j3"] = self._compute_cubic_trajectory((q[2], q_des[2]), (q_dot[2], q_vel_des[2]), t_range)
 
-            # for joint in self.planned_traject.keys():
-            #     self.planned_traject[joint] = np.concatenate((np.zeros((4, int(1.0/ManipulatorConfig.DT))), self.planned_traject.get(joint)), axis=1)
-
-            # plt.plot(traject[0, :], traject[1, :])
-
         # initialize
         jtrq = np.zeros(self._robot.n_a)
 
         # Set PD Gains for each joint
-        kp = 0.0
-        kd = 0.0
+        kp = 100.0
+        kd = 40.0
 
         if(self._count < np.size(self.planned_traject["j1"]["time"])):
             # Set desired joint angle, velocity, and acceleration vectors
@@ -123,16 +118,8 @@ class ManipulatorInterface(Interface):
                 self.planned_traject["j3"]["accel"][self._count]])
 
             # Inverse Dynamics control
-            
-            print("JTRQ")
-            print(jtrq)
             q_ddot = (q_accel_des + kp * (q_des - self._robot.get_q()) + kd * (q_vel_des - self._robot.get_q_dot()))
-            
             jtrq = self._robot.get_mass_matrix() @ q_ddot + self._robot.get_coriolis() + self._robot.get_gravity()
-
-            print(self._robot.get_mass_matrix())
-            print(self._robot.get_mass_matrix() @ q_accel_des )
-            print()
 
             # Record joint torque commands
             self.robot_traject["tau1"].append(jtrq[0])

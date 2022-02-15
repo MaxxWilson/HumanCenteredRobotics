@@ -12,6 +12,16 @@
             "console": "integratedTerminal",
             "python": "/home/jwilson/anaconda3/envs/hw1/bin/python",
             "cwd": "${workspaceFolder}/hw1"
+        },
+        {
+            "name": "HCR HW1 Profiling",
+            "type": "python",
+            "request": "launch",
+            "module": "cProfile",
+            "args": ["${workspaceFolder}/hw1/simulator/pybullet/manipulator_main.py"],
+            "console": "integratedTerminal",
+            "python": "/home/jwilson/anaconda3/envs/hw1/bin/python",
+            "cwd": "${workspaceFolder}/hw1"
         }
     ]
 }
