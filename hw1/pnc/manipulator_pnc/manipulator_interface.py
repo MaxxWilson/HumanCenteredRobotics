@@ -32,6 +32,14 @@ class ManipulatorInterface(Interface):
         else:
             raise ValueError("wrong dynamics library")
 
+        self.planned_traject = dict.fromkeys({"j1", "j2", "j3"})
+        for key in self.planned_traject:
+            self.planned_traject[key] = list()
+
+        self.robot_traject = dict.fromkeys({"time", "q1", "q2", "q3", "q1_vel", "q2_vel", "q3_vel", "tau1", "tau2", "tau3"}, list())
+        for key in self.robot_traject:
+            self.robot_traject[key] = list()
+
     def get_command(self, sensor_data):
         # Update Robot
         self._robot.update_system(
@@ -78,20 +86,102 @@ class ManipulatorInterface(Interface):
         q_des = np.array([0.35, 1.57, 0.35])
         q_vel_des = np.array([0, 0, 0])
 
+        # On first run, compute desired trajectory given start and end conditions for each joint
         if(self._count == 0):
             q = self._robot.get_q()
             q_dot = self._robot.get_q_dot()
-            traject = self._compute_cubic_trajectory((q[0], q_des[0]), (q_dot[0], q_vel_des[0]), (0, 5))
+            self.planned_traject["j1"] = self._compute_cubic_trajectory((q[0], q_des[0]), (q_dot[0], q_vel_des[0]), (0, 5))
+            self.planned_traject["j2"] = self._compute_cubic_trajectory((q[1], q_des[1]), (q_dot[1], q_vel_des[1]), (0, 5))
+            self.planned_traject["j3"] = self._compute_cubic_trajectory((q[2], q_des[2]), (q_dot[2], q_vel_des[2]), (0, 5))
+
+            # for joint in self.planned_traject.keys():
+            #     self.planned_traject[joint] = np.concatenate((np.zeros((4, int(1.0/ManipulatorConfig.DT))), self.planned_traject.get(joint)), axis=1)
+
             # plt.plot(traject[0, :], traject[1, :])
 
         # initialize
         jtrq = np.zeros(self._robot.n_a)
 
         # Set PD Gains for each joint
-        kp = np.array([6.0, 5.0, 3.0])
-        kd = np.array([10.0, 5.0, 3.0])
+        kp = 0.0
+        kd = 0.0
 
-        jtrq = kp * (q_des - self._robot.get_q()) + kd * (q_vel_des - self._robot.get_q_dot())
+        if(self._count < np.size(self.planned_traject["j1"]["time"])):
+            # Set desired joint angle, velocity, and acceleration vectors
+            q_des = np.array([
+                self.planned_traject["j1"]["angle"][self._count],
+                self.planned_traject["j2"]["angle"][self._count],
+                self.planned_traject["j3"]["angle"][self._count]])
+            q_vel_des = np.array([
+                self.planned_traject["j1"]["vel"][self._count],
+                self.planned_traject["j2"]["vel"][self._count],
+                self.planned_traject["j3"]["vel"][self._count]])
+            q_accel_des = np.array([
+                self.planned_traject["j1"]["accel"][self._count],
+                self.planned_traject["j2"]["accel"][self._count],
+                self.planned_traject["j3"]["accel"][self._count]])
+
+            # Inverse Dynamics control
+            jtrq = self._robot.get_coriolis() + self._robot.get_gravity()
+            jtrq += self._robot.get_mass_matrix() @ q_accel_des + kp * (q_des - self._robot.get_q()) + kd * (q_vel_des - self._robot.get_q_dot())
+
+            print("Mass Matrix:")
+            print(self._robot.get_mass_matrix())
+            print()
+
+            # Record joint torque commands
+            self.robot_traject["tau1"].append(jtrq[0])
+            self.robot_traject["tau2"].append(jtrq[1])
+            self.robot_traject["tau3"].append(jtrq[2])
+
+            # Record robots true state
+            self.robot_traject["time"].append(self._running_time)
+            self.robot_traject["q1"].append(self._robot.get_q()[0])
+            self.robot_traject["q2"].append(self._robot.get_q()[1])
+            self.robot_traject["q3"].append(self._robot.get_q()[2])
+            self.robot_traject["q1_vel"].append(self._robot.get_q_dot()[0])
+            self.robot_traject["q2_vel"].append(self._robot.get_q_dot()[1])
+            self.robot_traject["q3_vel"].append(self._robot.get_q_dot()[2])
+
+        else:
+            # Plot planned vs true trajectories after motion is done
+            plt.figure()
+            plt.subplot(2, 1, 1)
+            plt.plot(self.planned_traject["j1"]["time"], self.planned_traject["j1"]["angle"], linestyle='-')
+            plt.plot(self.robot_traject["time"], self.robot_traject["q1"])
+            plt.subplot(2, 1, 2)
+            plt.plot(self.planned_traject["j1"]["time"], self.planned_traject["j1"]["vel"], linestyle='-')
+            plt.plot(self.robot_traject["time"], self.robot_traject["q1_vel"])
+            plt.title("Joint 1")
+
+            plt.figure()
+            plt.subplot(2, 1, 1)
+            plt.plot(self.planned_traject["j2"]["time"], self.planned_traject["j2"]["angle"], linestyle='-')
+            plt.plot(self.robot_traject["time"], self.robot_traject["q2"])
+            plt.subplot(2, 1, 2)
+            plt.plot(self.planned_traject["j2"]["time"], self.planned_traject["j2"]["vel"], linestyle='-')
+            plt.plot(self.robot_traject["time"], self.robot_traject["q2_vel"])
+            plt.title("Joint 2")
+
+            plt.figure()
+            plt.subplot(2, 1, 1)
+            plt.plot(self.planned_traject["j3"]["time"], self.planned_traject["j3"]["angle"], linestyle='-')
+            plt.plot(self.robot_traject["time"], self.robot_traject["q3"])
+            plt.subplot(2, 1, 2)
+            plt.plot(self.planned_traject["j3"]["time"], self.planned_traject["j3"]["vel"], linestyle='-')
+            plt.plot(self.robot_traject["time"], self.robot_traject["q3_vel"])
+            plt.title("Joint 3")
+
+            plt.figure()
+            plt.subplot(3, 1, 1)
+            plt.plot(self.robot_traject["time"], self.robot_traject["tau1"])
+            plt.subplot(3, 1, 2)
+            plt.plot(self.robot_traject["time"], self.robot_traject["tau2"])
+            plt.subplot(3, 1, 3)
+            plt.plot(self.robot_traject["time"], self.robot_traject["tau3"])
+            plt.title("Joint 3")
+
+            plt.show(block=True)
 
         return jtrq
 
@@ -115,10 +205,16 @@ class ManipulatorInterface(Interface):
         [a, b, c, d] = inv @ np.transpose(np.array([q[0], q[1], q_dot[0], q_dot[1]]))
         timestamps = np.arange(t[0], t[1] + ManipulatorConfig.DT, ManipulatorConfig.DT)
         
-        trajectory = np.array([
-            timestamps,
-            a*timestamps**3 + b*timestamps**2 + c*timestamps + d,
-            3*a*timestamps**2 + 2*b*timestamps + c,
-            6*a*timestamps + 2*b])
+        # trajectory = np.array([
+        #     timestamps,
+        #     a*timestamps**3 + b*timestamps**2 + c*timestamps + d,
+        #     3*a*timestamps**2 + 2*b*timestamps + c,
+        #     6*a*timestamps + 2*b])
+
+        trajectory = dict.fromkeys({"time", "angle", "vel", "accel"}, np.array([]))
+        trajectory["time"] = np.array(timestamps)
+        trajectory["angle"] = np.array(a*timestamps**3 + b*timestamps**2 + c*timestamps + d)
+        trajectory["vel"] = np.array(3*a*timestamps**2 + 2*b*timestamps + c)
+        trajectory["accel"] = np.array(6*a*timestamps + 2*b)
 
         return trajectory
