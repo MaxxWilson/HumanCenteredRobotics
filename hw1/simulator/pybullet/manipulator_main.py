@@ -44,12 +44,23 @@ if __name__ == "__main__":
     p.resetJointState(robot, 0, -np.pi / 6., 0.)
     p.resetJointState(robot, 1, np.pi / 6., 0.)
     p.resetJointState(robot, 2, np.pi / 3., 0.)
+    # p.resetJointState(robot, 0, 0, 0.)
+    # p.resetJointState(robot, 1, 0, 0.)
+    # p.resetJointState(robot, 2, 0, 0.)
 
     # Joint Friction
     pybullet_util.set_joint_friction(robot, joint_id, 0.1)
 
     # Construct Interface
     interface = ManipulatorInterface()
+
+    obstacle_height = 0.5
+    p.addUserDebugLine(interface.obstacle[0], interface.obstacle[1], lineColorRGB=[0, 0, 1], lineWidth=2.0, lifeTime=0)
+    p.addUserDebugLine(interface.obstacle[0], interface.obstacle[0] + np.array([0, 0, obstacle_height]), lineColorRGB=[0, 0, 1], lineWidth=2.0, lifeTime=0)
+    p.addUserDebugLine(interface.obstacle[1], interface.obstacle[1] + np.array([0, 0, obstacle_height]), lineColorRGB=[0, 0, 1], lineWidth=2.0, lifeTime=0)
+    p.addUserDebugLine(interface.obstacle[0] + np.array([0, 0, obstacle_height]), interface.obstacle[1] + np.array([0, 0, obstacle_height]), lineColorRGB=[0, 0, 1], lineWidth=2.0, lifeTime=0)
+    p.addUserDebugLine(interface.obstacle[0], interface.obstacle[1] + np.array([0, 0, obstacle_height]), lineColorRGB=[0, 0, 1], lineWidth=2.0, lifeTime=0)
+    p.addUserDebugLine(interface.obstacle[1], interface.obstacle[0] + np.array([0, 0, obstacle_height]), lineColorRGB=[0, 0, 1], lineWidth=2.0, lifeTime=0)
 
     # Run Sim
     t = 0

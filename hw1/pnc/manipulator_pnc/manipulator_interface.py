@@ -43,6 +43,8 @@ class ManipulatorInterface(Interface):
         for key in self.robot_traject:
             self.robot_traject[key] = list()
             
+        self.obstacle = [np.array([1, 2.5, 0]), np.array([3, 1, 0])]
+            
         np.set_printoptions(linewidth=100)
 
     def get_command(self, sensor_data):
@@ -62,7 +64,10 @@ class ManipulatorInterface(Interface):
         # jtrq_cmd = self._compute_osc_command()
         
         # Question 4
-        jtrq_cmd = self._compute_wbc_command()
+        #jtrq_cmd = self._compute_wbc_command()
+        
+        # Question 5
+        jtrq_cmd = self._compute_obstacle_avoidance_cmd()
 
         jpos_cmd = np.zeros_like(jtrq_cmd)
         jvel_cmd = np.zeros_like(jtrq_cmd)
@@ -431,6 +436,39 @@ class ManipulatorInterface(Interface):
             sys.exit(0)
 
         return jtrq
+    
+    def _compute_obstacle_avoidance_cmd(self):
+        # initialize
+        jtrq = np.zeros(self._robot.n_a)
+        
+        kp1 = 80
+        kd1 = 30
+        kp2 = 50
+        kd2 = 10
+        
+        x1_des = np.array([np.pi/2])
+        x1_vel_des = np.array([0])
+        
+        x2_des = np.array([0, 0, 0])
+        x2_vel_des = np.array([0, 0, 0])
+        
+        [x1_i, _, _] = self.get_end_effector_position_2D("ee")
+        [x1_vel_i, _, _] = self.get_end_effector_velocity_2D("ee")
+        
+        x2_i = self._robot.get_q()
+        x2_vel_i = self._robot.get_q_dot()
+        
+        # On first run, compute desired trajectory given start and end conditions for each joint
+        if(self._count == 0):
+            t_range = (0, 2)
+            self.planned_traject["theta"] = self._compute_cubic_trajectory((x1_i, x1_des[0]), (x1_vel_i, x1_vel_des[0]), t_range)
+            self.planned_traject["q1"] = self._compute_cubic_trajectory((x2_i[0], x2_des[0]), (x2_vel_i[0], x2_vel_des[0]), t_range)
+            self.planned_traject["q2"] = self._compute_cubic_trajectory((x2_i[1], x2_des[1]), (x2_vel_i[1], x2_vel_des[1]), t_range)
+            self.planned_traject["q3"] = self._compute_cubic_trajectory((x2_i[2], x2_des[2]), (x2_vel_i[2], x2_vel_des[2]), t_range)
+        
+        # rotate_global_to_obs = self.get_rotation_to_obstacle()
+        # s_obs = np.array([[0, 0], [0, 1]])
+        # j_obs = rotate_global_to_obs.T @ s_obs @ rotate_global_to_obs @ j_p
 
     def _compute_cubic_trajectory(self, q: Tuple[float, float], q_dot: Tuple[float, float], t: Tuple[float, float]) -> np.ndarray:
 
@@ -461,3 +499,33 @@ class ManipulatorInterface(Interface):
     def get_end_effector_velocity_2D(self, link: str) -> np.ndarray:
         [theta_vel, x_vel, y_vel] = self._robot.get_link_jacobian(link)[2:5, :] @ self._robot.get_q_dot()
         return np.array([theta_vel, x_vel, y_vel])
+    
+    def get_ee_projected_on_obstacle(self):
+        # https://en.wikipedia.org/wiki/Vector_projection
+        
+        [_, x, y] = self.get_end_effector_position_2D("ee")
+        p1 = (np.array(self.obstacle[0][0:2])).reshape(2, 1)
+        p2 = (self.obstacle[1][0:2]).reshape(2, 1)
+        p3 = (np.array([x, y])).reshape(2, 1)
+        
+        a = p2 - p1
+        b = p3 - p1
+        return p1 + a @ a.T @ b / (a.T @ a)
+    
+    def get_vector_ee_to_obstacle_proj(self):
+        [_, x, y] = self.get_end_effector_position_2D("ee")
+        p = np.array([x, y]).reshape(2, 1)
+        p_proj = self.get_ee_projected_on_obstacle()
+        return p_proj - p
+    
+    def get_ee_dist_to_obstacle(self):
+        return np.linalg.norm(self.get_vector_ee_to_obstacle_proj())
+    
+    def get_obstacle_unit_normal(self):
+        return self.get_vector_ee_to_obstacle_proj() / self.get_ee_dist_to_obstacle()
+    
+    def get_rotation_to_obstacle(self):
+        unit_normal = self.get_obstacle_unit_normal()
+        unit_tangent = np.array([[0, 1], [-1, 0]]) @ unit_normal
+        return np.concatenate((unit_tangent, unit_normal), axis=1)
+        
