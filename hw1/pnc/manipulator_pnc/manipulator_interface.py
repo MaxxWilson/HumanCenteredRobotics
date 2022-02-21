@@ -502,11 +502,11 @@ class ManipulatorInterface(Interface):
         jtrq = np.zeros(self._robot.n_a)
         
         # Constants
-        kp1 = 8
-        kd1 = 5
-        kp2 = 1
-        kd2 = 1
-        kd_theta = 3
+        kp1 = 10
+        kd1 = 10
+        kp2 = 3
+        kd2 = 5
+        kd_q = 1.3
         beta = 0.5
 
         ee_des = np.array([1.5, 2])
@@ -534,62 +534,66 @@ class ManipulatorInterface(Interface):
                 self.planned_traject["y"]["accel"][self._count]])
 
         else:
-
-            xi_osc_des = np.array([
-                self.planned_traject["x"]["pos"][-1],
-                self.planned_traject["y"]["pos"][-1]])
-            xi_vel_osc_des = np.array([
-                self.planned_traject["x"]["vel"][-1],
-                self.planned_traject["y"]["vel"][-1]])
-            xi_accel_osc_des = np.array([
-                self.planned_traject["x"]["accel"][-1],
-                self.planned_traject["y"]["accel"][-1]])
-
-        xi_osc_des = ee_des
-        xi_vel_osc_des = np.array([0, 0])
-        xi_accel_osc_des = np.array([0, 0])
+            xi_osc_des = ee_des
+            xi_vel_osc_des = np.array([0, 0])
+            xi_accel_osc_des = np.array([0, 0])
 
         repulsion_force = 0
         d_obs = 0
-        if(self._count == 760):
-            print()
         if(self.get_ee_dist_to_obstacle() > beta):
             # Operational Space Control
             # Calculate acceleration reference in Task Space
             a_ref = (xi_accel_osc_des + kp2 * (xi_osc_des - np.array([x_i, y_i])) + kd2 * (xi_vel_osc_des - np.array([x_vel_i, y_vel_i])))
-            [theta_ref, _, _] = -kd_theta*self.get_end_effector_velocity_2D()
-
+            j_p = self._robot.get_link_jacobian("ee")[3:5, :]
+            A_pinv = pinv(self._robot.get_mass_matrix())
+            M_p = pinv(j_p @ A_pinv @ j_p.T)
+            j_p_bar = A_pinv @ j_p.T @ M_p
+            Np = np.eye(3) - j_p_bar @ j_p
+            
+            M_p_q = (Np @ A_pinv @ Np.T)
+            
             # Convert to joint space commands
-            aq_ref = pinv(self._robot.get_link_jacobian("ee")) @ (np.array([0, 0, theta_ref, a_ref[0], a_ref[1], 0]) - self._robot.get_link_jacobian_dot_times_qdot("ee"))
-            jtrq = self._robot.get_mass_matrix() @ aq_ref + self._robot.get_coriolis() + self._robot.get_gravity()
+            F_p = M_p @ (np.array([a_ref[0], a_ref[1]]) - self._robot.get_link_jacobian_dot_times_qdot("ee")[3:5])
+            F_q = M_p_q @ (-kd_q * self._robot.get_q_dot())
+            jtrq = j_p.T @ F_p + Np.T @ F_q + self._robot.get_coriolis() + self._robot.get_gravity()
         else:
             # Prioritized Obstacle Avoidance
             j_p = self._robot.get_link_jacobian("ee")[3:5, :]
-
+            A_inv = pinv(self._robot.get_mass_matrix())
+            
+            # Obstacle Task
             r_to_obs = self.get_rotation_to_obstacle()
             s_obs = np.array([[0, 0], [0, 1]])
             j_obs = r_to_obs @ s_obs @ r_to_obs.T @ j_p
-            M_obs = pinv(j_obs @ pinv(self._robot.get_mass_matrix()) @ j_obs.T)
+            M_obs = pinv(j_obs @ A_inv @ j_obs.T)
             
             d_obs = ((self.get_vector_ee_to_obstacle_proj() - beta * self.get_obstacle_unit_normal()).T@(self.get_vector_ee_to_obstacle_proj() - beta * self.get_obstacle_unit_normal()))[0,0]
             ee_vel_obs = r_to_obs.T@np.array([[x_vel_i], [y_vel_i]])
 
             a_ref_obs = r_to_obs @ ((-kp1 * np.array([0, -2*(d_obs - beta)]) - kd1 * np.array([0, ee_vel_obs[1, 0]])).reshape(2, 1))
             F_obs = M_obs @ (a_ref_obs - (self._robot.get_link_jacobian_dot_times_qdot("ee")[3:5]).reshape(2, 1))
-
-            j_obs_bar = pinv(self._robot.get_mass_matrix()) @ j_obs.T @ M_obs
+            
+            j_obs_bar = A_inv @ j_obs.T @ M_obs
             N_obs = np.eye(3) - j_obs_bar @ j_obs
+
+            # Position Task
             j_p_o = j_p @ N_obs
-            M_p_o = pinv(j_p_o @ pinv(self._robot.get_mass_matrix()) @ j_p_o.T)
+            M_p_o = pinv(j_p_o @ A_inv @ j_p_o.T)
             a_ref = (xi_accel_osc_des + kp2 * (xi_osc_des - np.array([x_i, y_i])) + kd2 * (xi_vel_osc_des - np.array([x_vel_i, y_vel_i]))).reshape(2, 1)
             F_p_o = M_p_o @ (a_ref - (self._robot.get_link_jacobian_dot_times_qdot("ee")[3:5]).reshape(2, 1))
+            j_p_bar = A_inv @ j_p_o.T @ M_p_o
+            N_p = (np.eye(3) - j_p_bar @ j_p) @ N_obs
 
+            # Joint Damping Task
+            j_q_p_o = N_p
+            M_q_p_o = pinv(j_q_p_o @ A_inv @ j_q_p_o.T)
+            F_q_p_o = M_q_p_o @ ((-kd_q * self._robot.get_q_dot()))
+            
             # Set Joint Torques
-            jtrq = j_obs.T @ F_obs + j_p_o.T @ F_p_o + (self._robot.get_coriolis() + self._robot.get_gravity()).reshape(3, 1)
+            jtrq = j_obs.T @ F_obs + j_p_o.T @ F_p_o + (j_q_p_o @ F_q_p_o).reshape(3, 1) + (self._robot.get_coriolis() + self._robot.get_gravity()).reshape(3, 1)
             repulsion_force = F_obs[1, 0]
         
         # Check for jacobian singularity
-        print(np.linalg.cond(self._robot.get_link_jacobian("ee")))
         if(abs(np.linalg.cond(self._robot.get_link_jacobian("ee"))) > 30):
             jtrq = np.array([0, 0, 0])
 
