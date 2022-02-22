@@ -51,7 +51,7 @@ class ManipulatorInterface(Interface):
         for key in self.robot_traject:
             self.robot_traject[key] = list()
             
-        self.obstacle = [np.array([0.5, 1.5, 0]), np.array([3, 1.0, 0])]
+        self.obstacle = [np.array([1.0, 1.0, 0]), np.array([2, 2.0, 0])]
         self.last_torque = np.array([0, 0, 0])
             
         np.set_printoptions(linewidth=100)
@@ -80,6 +80,11 @@ class ManipulatorInterface(Interface):
 
         jpos_cmd = np.zeros_like(jtrq_cmd)
         jvel_cmd = np.zeros_like(jtrq_cmd)
+
+        # Apply torque limit
+        t_lim = 150
+        jtrq_cmd[jtrq_cmd > t_lim] = t_lim
+        jtrq_cmd[jtrq_cmd < -t_lim] = -t_lim
 
         # Compute Cmd
         command = self._robot.create_cmd_ordered_dict(jpos_cmd, jvel_cmd,
@@ -505,16 +510,16 @@ class ManipulatorInterface(Interface):
         jtrq = np.zeros(self._robot.n_a)
         
         # Constants
-        kp1 = 10
-        kd1 = 10
-        beta = 0.5
+        kp1 = 0.5
+        kd1 = 20
+        beta = 0.4
         
         kp2 = 20
         kd2 = 10
         kp_q = 0.0
         kd_q = 0.0
 
-        ee_des = np.array([1.57, 1.0, 2.0])
+        ee_des = np.array([1.57, 1.5, 1.5])
         ee_vel_des = np.array([0, 0, 0])
         
         [theta_i, x_i, y_i] = self.get_end_effector_position_2D("ee")
@@ -542,7 +547,6 @@ class ManipulatorInterface(Interface):
                 self.planned_traject["x"]["accel"][self._count],
                 self.planned_traject["y"]["accel"][self._count]])
         else:
-            # print(self._count)
             xi_osc_des = ee_des
             xi_vel_osc_des = np.array([0, 0, 0])
             xi_accel_osc_des = np.array([0, 0, 0])
