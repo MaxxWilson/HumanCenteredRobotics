@@ -13,7 +13,11 @@ from pnc.interface import Interface
 from config.manipulator_config import ManipulatorConfig
 
 from typing import Tuple
-import matplotlib.pyplot as plt
+
+plotting = True
+
+if(plotting):
+    import matplotlib.pyplot as plt
 
 class ManipulatorInterface(Interface):
     def __init__(self):
@@ -48,8 +52,11 @@ class ManipulatorInterface(Interface):
 
         for key in self.robot_traject:
             self.robot_traject[key] = list()
-            
+        
+        # Switch display for obstacle (Q5)    
         self.show_obstacle = False
+        # self.show_obstacle = True
+        
         self.obstacle = [np.array([1.0, 2.0, 0]), np.array([3, 1.0, 0])]
         
         self.last_torque = np.array([0, 0, 0])
@@ -135,26 +142,30 @@ class ManipulatorInterface(Interface):
                 self.planned_traject["j1"]["accel"][self._count],
                 self.planned_traject["j2"]["accel"][self._count],
                 self.planned_traject["j3"]["accel"][self._count]])
-
-            # Inverse Dynamics control
-            q_ddot = (qi_accel_des + kp * (qi_des - self._robot.get_q()) + kd * (qi_vel_des - self._robot.get_q_dot()))
-            jtrq = self._robot.get_mass_matrix() @ q_ddot + self._robot.get_coriolis() + self._robot.get_gravity()
-
-            # Record joint torque commands
-            self.robot_traject["tau1"].append(jtrq[0])
-            self.robot_traject["tau2"].append(jtrq[1])
-            self.robot_traject["tau3"].append(jtrq[2])
-
-            # Record robots true state
-            self.robot_traject["time"].append(self._running_time)
-            self.robot_traject["q1"].append(self._robot.get_q()[0])
-            self.robot_traject["q2"].append(self._robot.get_q()[1])
-            self.robot_traject["q3"].append(self._robot.get_q()[2])
-            self.robot_traject["q1_vel"].append(self._robot.get_q_dot()[0])
-            self.robot_traject["q2_vel"].append(self._robot.get_q_dot()[1])
-            self.robot_traject["q3_vel"].append(self._robot.get_q_dot()[2])
-
         else:
+            qi_des = q_des
+            qi_vel_des = np.array([0, 0, 0])
+            qi_accel_des = np.array([0, 0,0])
+
+        # Inverse Dynamics control
+        q_ddot = (qi_accel_des + kp * (qi_des - self._robot.get_q()) + kd * (qi_vel_des - self._robot.get_q_dot()))
+        jtrq = self._robot.get_mass_matrix() @ q_ddot + self._robot.get_coriolis() + self._robot.get_gravity()
+
+        # Record joint torque commands
+        self.robot_traject["tau1"].append(jtrq[0])
+        self.robot_traject["tau2"].append(jtrq[1])
+        self.robot_traject["tau3"].append(jtrq[2])
+
+        # Record robots true state
+        self.robot_traject["time"].append(self._running_time)
+        self.robot_traject["q1"].append(self._robot.get_q()[0])
+        self.robot_traject["q2"].append(self._robot.get_q()[1])
+        self.robot_traject["q3"].append(self._robot.get_q()[2])
+        self.robot_traject["q1_vel"].append(self._robot.get_q_dot()[0])
+        self.robot_traject["q2_vel"].append(self._robot.get_q_dot()[1])
+        self.robot_traject["q3_vel"].append(self._robot.get_q_dot()[2])
+
+        if(self._count >= np.size(self.planned_traject["j1"]["time"])-1 and plotting):
             # Plot planned vs true trajectories after motion is done
             plt.figure()
             plt.subplot(2, 1, 1).set_title("Joint 1 Angle")
@@ -256,29 +267,33 @@ class ManipulatorInterface(Interface):
                 self.planned_traject["theta"]["accel"][self._count],
                 self.planned_traject["x"]["accel"][self._count],
                 self.planned_traject["y"]["accel"][self._count]])
-            
-            # Calculate acceleration reference in Task Space
-            a_ref = (xi_accel_osc_des + kp * (xi_osc_des - np.array([theta_i, x_i, y_i])) + kd * (xi_vel_osc_des - np.array([theta_vel_i, x_vel_i, y_vel_i])))
-
-            aq_ref = pinv(self._robot.get_link_jacobian("ee")) @ (np.array([0, 0, a_ref[0], a_ref[1], a_ref[2], 0]) - self._robot.get_link_jacobian_dot_times_qdot("ee"))
-            
-            jtrq = self._robot.get_mass_matrix() @ aq_ref + self._robot.get_coriolis() + self._robot.get_gravity()
-
-            # Record joint torque commands
-            self.robot_traject["tau1"].append(jtrq[0])
-            self.robot_traject["tau2"].append(jtrq[1])
-            self.robot_traject["tau3"].append(jtrq[2])
-
-            # Record robots true state
-            self.robot_traject["time"].append(self._running_time)
-            self.robot_traject["theta"].append(theta_i)
-            self.robot_traject["x"].append(x_i)
-            self.robot_traject["y"].append(y_i)
-            self.robot_traject["theta_vel"].append(theta_vel_i)
-            self.robot_traject["x_vel"].append(x_vel_i)
-            self.robot_traject["y_vel"].append(y_vel_i)
-
         else:
+            xi_osc_des = xosc_des
+            xi_vel_osc_des = np.array([0, 0, 0])
+            xi_accel_osc_des = np.array([0, 0,0])
+            
+        # Calculate acceleration reference in Task Space
+        a_ref = (xi_accel_osc_des + kp * (xi_osc_des - np.array([theta_i, x_i, y_i])) + kd * (xi_vel_osc_des - np.array([theta_vel_i, x_vel_i, y_vel_i])))
+
+        aq_ref = pinv(self._robot.get_link_jacobian("ee")) @ (np.array([0, 0, a_ref[0], a_ref[1], a_ref[2], 0]) - self._robot.get_link_jacobian_dot_times_qdot("ee"))
+        
+        jtrq = self._robot.get_mass_matrix() @ aq_ref + self._robot.get_coriolis() + self._robot.get_gravity()
+
+        # Record joint torque commands
+        self.robot_traject["tau1"].append(jtrq[0])
+        self.robot_traject["tau2"].append(jtrq[1])
+        self.robot_traject["tau3"].append(jtrq[2])
+
+        # Record robots true state
+        self.robot_traject["time"].append(self._running_time)
+        self.robot_traject["theta"].append(theta_i)
+        self.robot_traject["x"].append(x_i)
+        self.robot_traject["y"].append(y_i)
+        self.robot_traject["theta_vel"].append(theta_vel_i)
+        self.robot_traject["x_vel"].append(x_vel_i)
+        self.robot_traject["y_vel"].append(y_vel_i)
+
+        if(self._count >= np.size(self.planned_traject["x"]["time"])-1 and plotting):
             # Plot planned vs true trajectories after motion is done
             plt.figure()
             plt.subplot(2, 1, 1).set_title("X Position")
@@ -393,48 +408,58 @@ class ManipulatorInterface(Interface):
                 self.planned_traject["q1"]["accel"][self._count],
                 self.planned_traject["q2"]["accel"][self._count],
                 self.planned_traject["q3"]["accel"][self._count]])
-            
-            A = self._robot.get_mass_matrix()
-            b = self._robot.get_coriolis()
-            g = self._robot.get_gravity()
-            A_pinv = pinv(A)
-            
-            j_x1 = np.array([self._robot.get_link_jacobian("ee")[2, :]])    # Jacobian from q1, q2, q3 to theta [1x3]
-            j_x1_t = np.transpose(j_x1)                                     # [3x1]
-            j_x1_pinv = pinv(j_x1)                                          # [3x1]
-            
-            M_x1 = pinv(j_x1 @ A_pinv @ j_x1_t).reshape(1, 1)               # [1x3]*[3x3]*[3x1] = scalar
-            
-            j_x1_bar = A_pinv @ j_x1_t @ M_x1                               # [3x3]*[3x1]*scalar = [3x1]
-            N_x1 = np.eye(3) - j_x1_bar @ j_x1                              # [3x3] - [3x1]*[1x3] = [3x3], Rank 2
-            N_x1_t = np.transpose(N_x1)
-            
-            j_x2_x1 = N_x1  # Task 2 is already in joint space
-            j_x2_x1_t = np.transpose(j_x2_x1)
-            M_x2_x1 = pinv(j_x2_x1 @ A_pinv @ j_x2_x1_t)
-            
-            F_x1 = M_x1 @ (x1_accel_des + kp1 * (x1_des - x1_i) + kd1 * (x1_vel_des - x1_vel_i) - self._robot.get_link_jacobian_dot_times_qdot("ee")[2]).reshape(1, 1)
-            F_x2 = M_x2_x1 @ (x2_accel_des + kp2 * (x2_des - x2_i) + kd2 * (x2_vel_des - x2_vel_i))
-
-            jtrq = j_x1_t @ F_x1 + (j_x2_x1_t @ F_x2 + b+g).reshape(3, 1)
-            
-            # Record joint torque commands
-            self.robot_traject["tau1"].append(jtrq[0])
-            self.robot_traject["tau2"].append(jtrq[1])
-            self.robot_traject["tau3"].append(jtrq[2])
-
-            # Record robots true state
-            self.robot_traject["time"].append(self._running_time)
-            self.robot_traject["theta"].append(x1_i)
-            self.robot_traject["theta_vel"].append(x1_vel_i)
-            self.robot_traject["q1"].append(self._robot.get_q()[0])
-            self.robot_traject["q2"].append(self._robot.get_q()[1])
-            self.robot_traject["q3"].append(self._robot.get_q()[2])
-            self.robot_traject["q1_vel"].append(self._robot.get_q_dot()[0])
-            self.robot_traject["q2_vel"].append(self._robot.get_q_dot()[1])
-            self.robot_traject["q3_vel"].append(self._robot.get_q_dot()[2])
-            
         else:
+            # Get current setpoints for each task
+            x1_accel_des = np.array([0])
+            
+            x2_des = np.array([
+                self.planned_traject["q1"]["pos"][-1],
+                self.planned_traject["q2"]["pos"][-1],
+                self.planned_traject["q3"]["pos"][-1]])
+            x2_vel_des = np.array([0, 0, 0])
+            x2_accel_des = np.array([0, 0, 0])
+            
+        A = self._robot.get_mass_matrix()
+        b = self._robot.get_coriolis()
+        g = self._robot.get_gravity()
+        A_pinv = pinv(A)
+        
+        j_x1 = np.array([self._robot.get_link_jacobian("ee")[2, :]])    # Jacobian from q1, q2, q3 to theta [1x3]
+        j_x1_t = np.transpose(j_x1)                                     # [3x1]
+        j_x1_pinv = pinv(j_x1)                                          # [3x1]
+        
+        M_x1 = pinv(j_x1 @ A_pinv @ j_x1_t).reshape(1, 1)               # [1x3]*[3x3]*[3x1] = scalar
+        
+        j_x1_bar = A_pinv @ j_x1_t @ M_x1                               # [3x3]*[3x1]*scalar = [3x1]
+        N_x1 = np.eye(3) - j_x1_bar @ j_x1                              # [3x3] - [3x1]*[1x3] = [3x3], Rank 2
+        N_x1_t = np.transpose(N_x1)
+        
+        j_x2_x1 = N_x1  # Task 2 is already in joint space
+        j_x2_x1_t = np.transpose(j_x2_x1)
+        M_x2_x1 = pinv(j_x2_x1 @ A_pinv @ j_x2_x1_t)
+        
+        F_x1 = M_x1 @ (x1_accel_des + kp1 * (x1_des - x1_i) + kd1 * (x1_vel_des - x1_vel_i) - self._robot.get_link_jacobian_dot_times_qdot("ee")[2]).reshape(1, 1)
+        F_x2 = M_x2_x1 @ (x2_accel_des + kp2 * (x2_des - x2_i) + kd2 * (x2_vel_des - x2_vel_i))
+
+        jtrq = j_x1_t @ F_x1 + (j_x2_x1_t @ F_x2 + b+g).reshape(3, 1)
+        
+        # Record joint torque commands
+        self.robot_traject["tau1"].append(jtrq[0])
+        self.robot_traject["tau2"].append(jtrq[1])
+        self.robot_traject["tau3"].append(jtrq[2])
+
+        # Record robots true state
+        self.robot_traject["time"].append(self._running_time)
+        self.robot_traject["theta"].append(x1_i)
+        self.robot_traject["theta_vel"].append(x1_vel_i)
+        self.robot_traject["q1"].append(self._robot.get_q()[0])
+        self.robot_traject["q2"].append(self._robot.get_q()[1])
+        self.robot_traject["q3"].append(self._robot.get_q()[2])
+        self.robot_traject["q1_vel"].append(self._robot.get_q_dot()[0])
+        self.robot_traject["q2_vel"].append(self._robot.get_q_dot()[1])
+        self.robot_traject["q3_vel"].append(self._robot.get_q_dot()[2])
+            
+        if(self._count >= np.size(self.planned_traject["theta"]["time"])-1 and plotting):
             # Plot planned vs true trajectories after motion is done
             plt.figure()
             plt.subplot(2, 1, 1).set_title("Theta Angle")
@@ -583,8 +608,8 @@ class ManipulatorInterface(Interface):
             d_obs = ((self.get_vector_ee_to_obstacle_proj() - beta * self.get_obstacle_unit_normal()).T@(self.get_vector_ee_to_obstacle_proj() - beta * self.get_obstacle_unit_normal()))[0,0]
             ee_vel_obs = r_to_obs.T@np.array([[x_vel_i], [y_vel_i]])
 
-            a_ref_obs = r_to_obs @ ((-kp1 * np.array([0, -2*(d_obs - beta)]) - kd1 * np.array([0, ee_vel_obs[1, 0]])).reshape(2, 1))
-            F_obs = M_obs @ (a_ref_obs - (self._robot.get_link_jacobian_dot_times_qdot("ee")[3:5]).reshape(2, 1))
+            a_ref_obs = r_to_obs @ (-kp1 * np.array([0, -2*(d_obs - beta)]) - kd1 * np.array([0, ee_vel_obs[1, 0]]))
+            F_obs = M_obs @ (a_ref_obs - self._robot.get_link_jacobian_dot_times_qdot("ee")[3:5])
             
             j_obs_bar = A_inv @ j_obs.T @ M_obs
             N_obs = np.eye(3) - j_obs_bar @ j_obs
@@ -592,19 +617,19 @@ class ManipulatorInterface(Interface):
             # Position Task
             j_p_o = j_p @ N_obs
             M_p_o = pinv(j_p_o @ A_inv @ j_p_o.T)
-            a_ref = (xi_accel_osc_des + kp2 * (xi_osc_des - np.array([x_i, y_i])) + kd2 * (xi_vel_osc_des - np.array([x_vel_i, y_vel_i]))).reshape(2, 1)
-            F_p_o = M_p_o @ (a_ref - (self._robot.get_link_jacobian_dot_times_qdot("ee")[3:5]).reshape(2, 1))
+            a_ref = xi_accel_osc_des + kp2 * (xi_osc_des - np.array([x_i, y_i])) + kd2 * (xi_vel_osc_des - np.array([x_vel_i, y_vel_i]))
+            F_p_o = M_p_o @ (a_ref - self._robot.get_link_jacobian_dot_times_qdot("ee")[3:5])
             j_p_bar = A_inv @ j_p_o.T @ M_p_o
             N_p = (np.eye(3) - j_p_bar @ j_p) @ N_obs
 
             # Joint Damping Task
             j_q_p_o = N_p
             M_q_p_o = pinv(j_q_p_o @ A_inv @ j_q_p_o.T)
-            F_q_p_o = M_q_p_o @ (-kp_q * self._robot.get_q() - kd_q * self._robot.get_q_dot()).reshape(3, 1)
+            F_q_p_o = M_q_p_o @ (-kp_q * self._robot.get_q() - kd_q * self._robot.get_q_dot())
             
             # Set Joint Torques
-            jtrq = j_obs.T @ F_obs + j_p_o.T @ F_p_o + j_q_p_o @ F_q_p_o +  (self._robot.get_coriolis() + self._robot.get_gravity()).reshape(3, 1)
-            repulsion_force = F_obs[1, 0]
+            jtrq = j_obs.T @ F_obs + j_p_o.T @ F_p_o + j_q_p_o @ F_q_p_o +  self._robot.get_coriolis() + self._robot.get_gravity()
+            repulsion_force = np.linalg.norm(F_obs)
         
         # Check for jacobian singularity
         if(abs(np.linalg.cond(self._robot.get_link_jacobian("ee"))) > 30):
@@ -636,7 +661,7 @@ class ManipulatorInterface(Interface):
         self.robot_traject["force"].append(repulsion_force)
         self.robot_traject["d_obs"].append(self.get_ee_dist_to_obstacle())
 
-        if(self._count > np.size(self.planned_traject["x"]["time"]) + 10):
+        if(self._count >= np.size(self.planned_traject["x"]["time"])-1 and plotting):
             # Plot
             plt.figure()
             plt.subplot(2, 1, 1).set_title("X Position")
@@ -668,40 +693,40 @@ class ManipulatorInterface(Interface):
             plt.legend()
             plt.subplots_adjust(hspace=0.5)
 
-            plt.figure()
-            plt.subplot(2, 1, 1).set_title("Joint 1 Angle")
-            plt.plot(self.robot_traject["time"], self.robot_traject["q1"], label = "Actual")
-            plt.ylabel("Angle (rad)")
-            plt.xlabel("Time (s)")
-            plt.legend()
-            plt.subplot(2, 1, 2).set_title("Joint 1 Velocity")
-            plt.plot(self.robot_traject["time"], self.robot_traject["q1_vel"], label = "Actual")
-            plt.ylabel("Angular Velocity (rad/s)")
-            plt.xlabel("Time (s)")
-            plt.legend()
-            plt.subplots_adjust(hspace=0.5)
+            # plt.figure()
+            # plt.subplot(2, 1, 1).set_title("Joint 1 Angle")
+            # plt.plot(self.robot_traject["time"], self.robot_traject["q1"], label = "Actual")
+            # plt.ylabel("Angle (rad)")
+            # plt.xlabel("Time (s)")
+            # plt.legend()
+            # plt.subplot(2, 1, 2).set_title("Joint 1 Velocity")
+            # plt.plot(self.robot_traject["time"], self.robot_traject["q1_vel"], label = "Actual")
+            # plt.ylabel("Angular Velocity (rad/s)")
+            # plt.xlabel("Time (s)")
+            # plt.legend()
+            # plt.subplots_adjust(hspace=0.5)
 
-            plt.figure()
-            plt.subplot(2, 1, 1).set_title("Joint 2 Angle")
-            plt.plot(self.robot_traject["time"], self.robot_traject["q2"], label = "Actual")
-            plt.ylabel("Angle (rad)")
-            plt.xlabel("Time (s)")
-            plt.subplot(2, 1, 2).set_title("Joint 2 Velocity")
-            plt.plot(self.robot_traject["time"], self.robot_traject["q2_vel"], label = "Actual")
-            plt.ylabel("Angular Velocity (rad/s)")
-            plt.xlabel("Time (s)")
-            plt.subplots_adjust(hspace=0.5)
+            # plt.figure()
+            # plt.subplot(2, 1, 1).set_title("Joint 2 Angle")
+            # plt.plot(self.robot_traject["time"], self.robot_traject["q2"], label = "Actual")
+            # plt.ylabel("Angle (rad)")
+            # plt.xlabel("Time (s)")
+            # plt.subplot(2, 1, 2).set_title("Joint 2 Velocity")
+            # plt.plot(self.robot_traject["time"], self.robot_traject["q2_vel"], label = "Actual")
+            # plt.ylabel("Angular Velocity (rad/s)")
+            # plt.xlabel("Time (s)")
+            # plt.subplots_adjust(hspace=0.5)
             
-            plt.figure()
-            plt.subplot(2, 1, 1).set_title("Joint 3 Angle")
-            plt.plot(self.robot_traject["time"], self.robot_traject["q3"], label = "Actual")
-            plt.ylabel("Angle (rad)")
-            plt.xlabel("Time (s)")
-            plt.subplot(2, 1, 2).set_title("Joint 3 Velocity")
-            plt.plot(self.robot_traject["time"], self.robot_traject["q3_vel"], label = "Actual")
-            plt.ylabel("Angular Velocity (rad/s)")
-            plt.xlabel("Time (s)")
-            plt.subplots_adjust(hspace=0.5)
+            # plt.figure()
+            # plt.subplot(2, 1, 1).set_title("Joint 3 Angle")
+            # plt.plot(self.robot_traject["time"], self.robot_traject["q3"], label = "Actual")
+            # plt.ylabel("Angle (rad)")
+            # plt.xlabel("Time (s)")
+            # plt.subplot(2, 1, 2).set_title("Joint 3 Velocity")
+            # plt.plot(self.robot_traject["time"], self.robot_traject["q3_vel"], label = "Actual")
+            # plt.ylabel("Angular Velocity (rad/s)")
+            # plt.xlabel("Time (s)")
+            # plt.subplots_adjust(hspace=0.5)
 
             plt.figure()
             plt.subplot(3, 1, 1).set_title("Joint 1 Torque")
@@ -723,7 +748,6 @@ class ManipulatorInterface(Interface):
             plt.plot(self.robot_traject["time"], self.robot_traject["force"])
             plt.ylabel("Force (N)")
             plt.xlabel("Time (s)")
-            plt.legend()
             plt.subplot(2, 1, 2).set_title("Distance to Obstacle")
             plt.plot(self.robot_traject["time"], self.robot_traject["d_obs"])
             plt.plot(self.robot_traject["time"], beta*np.ones_like(self.robot_traject["time"]), linestyle='--')
@@ -732,6 +756,7 @@ class ManipulatorInterface(Interface):
             plt.subplots_adjust(hspace=1.00)
 
             plt.show(block=True)
+            sys.exit(0)
         return jtrq
 
     def _compute_cubic_trajectory(self, q: Tuple[float, float], q_dot: Tuple[float, float], t: Tuple[float, float]) -> np.ndarray:
