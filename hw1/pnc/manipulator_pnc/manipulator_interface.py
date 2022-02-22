@@ -1,7 +1,6 @@
 from array import array
 import os
 import sys
-from tkinter.tix import X_REGION
 
 cwd = os.getcwd()
 sys.path.append(cwd)
@@ -53,6 +52,7 @@ class ManipulatorInterface(Interface):
             self.robot_traject[key] = list()
             
         self.obstacle = [np.array([0.5, 1.5, 0]), np.array([3, 1.0, 0])]
+        self.last_torque = np.array([0, 0, 0])
             
         np.set_printoptions(linewidth=100)
 
@@ -85,6 +85,9 @@ class ManipulatorInterface(Interface):
         command = self._robot.create_cmd_ordered_dict(jpos_cmd, jvel_cmd,
                                                       jtrq_cmd)
 
+        # Update previous torque
+        self.last_torque = jtrq_cmd
+        
         # Increase time variables
         self._count += 1
         self._running_time += ManipulatorConfig.DT
@@ -504,67 +507,67 @@ class ManipulatorInterface(Interface):
         # Constants
         kp1 = 10
         kd1 = 10
-        kp2 = 3
-        kd2 = 5
-        kd_q = 1.3
         beta = 0.5
-
-        ee_des = np.array([1.5, 2])
-        ee_vel_des = np.array([0, 0])
         
-        [_, x_i, y_i] = self.get_end_effector_position_2D("ee")
-        [_, x_vel_i, y_vel_i] = self.get_end_effector_velocity_2D("ee")
+        kp2 = 20
+        kd2 = 10
+        kp_q = 0.0
+        kd_q = 0.0
+
+        ee_des = np.array([1.57, 1.0, 2.0])
+        ee_vel_des = np.array([0, 0, 0])
+        
+        [theta_i, x_i, y_i] = self.get_end_effector_position_2D("ee")
+        [theta_vel_i, x_vel_i, y_vel_i] = self.get_end_effector_velocity_2D("ee")
         
         # On first run, compute desired trajectory given start and end conditions for each joint
         if(self._count == 0):
             t_range = (0, 2)
-            self.planned_traject["x"] = self._compute_cubic_trajectory((x_i, ee_des[0]), (x_vel_i, ee_vel_des[0]), t_range)
-            self.planned_traject["y"] = self._compute_cubic_trajectory((y_i, ee_des[1]), (y_vel_i, ee_vel_des[1]), t_range)
+            self.planned_traject["theta"] = self._compute_cubic_trajectory((theta_i, ee_des[0]), (theta_vel_i, ee_vel_des[0]), t_range)
+            self.planned_traject["x"] = self._compute_cubic_trajectory((x_i, ee_des[1]), (x_vel_i, ee_vel_des[1]), t_range)
+            self.planned_traject["y"] = self._compute_cubic_trajectory((y_i, ee_des[2]), (y_vel_i, ee_vel_des[2]), t_range)
 
         if(self._count < np.size(self.planned_traject["x"]["time"])):
             # Set desired end effector position, velocity, and acceleration vectors
             xi_osc_des = np.array([
+                self.planned_traject["theta"]["pos"][self._count],
                 self.planned_traject["x"]["pos"][self._count],
                 self.planned_traject["y"]["pos"][self._count]])
             xi_vel_osc_des = np.array([
+                self.planned_traject["theta"]["vel"][self._count],
                 self.planned_traject["x"]["vel"][self._count],
                 self.planned_traject["y"]["vel"][self._count]])
             xi_accel_osc_des = np.array([
+                self.planned_traject["theta"]["accel"][self._count],
                 self.planned_traject["x"]["accel"][self._count],
                 self.planned_traject["y"]["accel"][self._count]])
-
         else:
+            # print(self._count)
             xi_osc_des = ee_des
-            xi_vel_osc_des = np.array([0, 0])
-            xi_accel_osc_des = np.array([0, 0])
+            xi_vel_osc_des = np.array([0, 0, 0])
+            xi_accel_osc_des = np.array([0, 0, 0])
 
         repulsion_force = 0
         d_obs = 0
         if(self.get_ee_dist_to_obstacle() > beta):
             # Operational Space Control
             # Calculate acceleration reference in Task Space
-            a_ref = (xi_accel_osc_des + kp2 * (xi_osc_des - np.array([x_i, y_i])) + kd2 * (xi_vel_osc_des - np.array([x_vel_i, y_vel_i])))
-            j_p = self._robot.get_link_jacobian("ee")[3:5, :]
-            A_pinv = pinv(self._robot.get_mass_matrix())
-            M_p = pinv(j_p @ A_pinv @ j_p.T)
-            j_p_bar = A_pinv @ j_p.T @ M_p
-            Np = np.eye(3) - j_p_bar @ j_p
-            
-            M_p_q = (Np @ A_pinv @ Np.T)
+            a_ref = (xi_accel_osc_des + kp2 * (xi_osc_des - np.array([theta_i, x_i, y_i])) + kd2 * (xi_vel_osc_des - np.array([theta_vel_i, x_vel_i, y_vel_i])))
+            j_p = self._robot.get_link_jacobian("ee")[2:5, :]
+            M_p = pinv(j_p @ pinv(self._robot.get_mass_matrix()) @ j_p.T)
+            F_p = M_p @ (a_ref - self._robot.get_link_jacobian_dot_times_qdot("ee")[2:5])
             
             # Convert to joint space commands
-            F_p = M_p @ (np.array([a_ref[0], a_ref[1]]) - self._robot.get_link_jacobian_dot_times_qdot("ee")[3:5])
-            F_q = M_p_q @ (-kd_q * self._robot.get_q_dot())
-            jtrq = j_p.T @ F_p + Np.T @ F_q + self._robot.get_coriolis() + self._robot.get_gravity()
+            jtrq = j_p.T @ F_p + self._robot.get_coriolis() + self._robot.get_gravity()
         else:
             # Prioritized Obstacle Avoidance
-            j_p = self._robot.get_link_jacobian("ee")[3:5, :]
+            j_p = self._robot.get_link_jacobian("ee")[2:5, :]
             A_inv = pinv(self._robot.get_mass_matrix())
             
             # Obstacle Task
             r_to_obs = self.get_rotation_to_obstacle()
             s_obs = np.array([[0, 0], [0, 1]])
-            j_obs = r_to_obs @ s_obs @ r_to_obs.T @ j_p
+            j_obs = r_to_obs @ s_obs @ r_to_obs.T @ j_p[1:, :]
             M_obs = pinv(j_obs @ A_inv @ j_obs.T)
             
             d_obs = ((self.get_vector_ee_to_obstacle_proj() - beta * self.get_obstacle_unit_normal()).T@(self.get_vector_ee_to_obstacle_proj() - beta * self.get_obstacle_unit_normal()))[0,0]
@@ -572,6 +575,8 @@ class ManipulatorInterface(Interface):
 
             a_ref_obs = r_to_obs @ ((-kp1 * np.array([0, -2*(d_obs - beta)]) - kd1 * np.array([0, ee_vel_obs[1, 0]])).reshape(2, 1))
             F_obs = M_obs @ (a_ref_obs - (self._robot.get_link_jacobian_dot_times_qdot("ee")[3:5]).reshape(2, 1))
+            trq_obs = j_obs.T @ F_obs
+            trq_obs = np.array([0, trq_obs[0], trq_obs[1]]).reshape(3, 1)
             
             j_obs_bar = A_inv @ j_obs.T @ M_obs
             N_obs = np.eye(3) - j_obs_bar @ j_obs
@@ -579,23 +584,23 @@ class ManipulatorInterface(Interface):
             # Position Task
             j_p_o = j_p @ N_obs
             M_p_o = pinv(j_p_o @ A_inv @ j_p_o.T)
-            a_ref = (xi_accel_osc_des + kp2 * (xi_osc_des - np.array([x_i, y_i])) + kd2 * (xi_vel_osc_des - np.array([x_vel_i, y_vel_i]))).reshape(2, 1)
-            F_p_o = M_p_o @ (a_ref - (self._robot.get_link_jacobian_dot_times_qdot("ee")[3:5]).reshape(2, 1))
+            a_ref = (xi_accel_osc_des + kp2 * (xi_osc_des - np.array([theta_i, x_i, y_i])) + kd2 * (xi_vel_osc_des - np.array([theta_vel_i, x_vel_i, y_vel_i]))).reshape(3, 1)
+            F_p_o = M_p_o @ (a_ref - (self._robot.get_link_jacobian_dot_times_qdot("ee")[2:5]).reshape(3, 1))
             j_p_bar = A_inv @ j_p_o.T @ M_p_o
             N_p = (np.eye(3) - j_p_bar @ j_p) @ N_obs
 
             # Joint Damping Task
-            j_q_p_o = N_p
-            M_q_p_o = pinv(j_q_p_o @ A_inv @ j_q_p_o.T)
-            F_q_p_o = M_q_p_o @ ((-kd_q * self._robot.get_q_dot()))
+            # j_q_p_o = N_p
+            # M_q_p_o = pinv(j_q_p_o @ A_inv @ j_q_p_o.T)
+            # F_q_p_o = M_q_p_o @ (-kp_q * self._robot.get_q() - kd_q * self._robot.get_q_dot())
             
             # Set Joint Torques
-            jtrq = j_obs.T @ F_obs + j_p_o.T @ F_p_o + (j_q_p_o @ F_q_p_o).reshape(3, 1) + (self._robot.get_coriolis() + self._robot.get_gravity()).reshape(3, 1)
+            jtrq = trq_obs + j_p_o.T @ F_p_o + (self._robot.get_coriolis() + self._robot.get_gravity()).reshape(3, 1)
             repulsion_force = F_obs[1, 0]
         
         # Check for jacobian singularity
         if(abs(np.linalg.cond(self._robot.get_link_jacobian("ee"))) > 30):
-            jtrq = np.array([0, 0, 0])
+            jtrq = self.last_torque
 
         # Record robots true state
         self.robot_traject["time"].append(self._running_time)
@@ -603,8 +608,10 @@ class ManipulatorInterface(Interface):
         # EE States
         self.robot_traject["x"].append(x_i)
         self.robot_traject["y"].append(y_i)
+        self.robot_traject["theta"].append(x_i)
         self.robot_traject["x_vel"].append(x_vel_i)
         self.robot_traject["y_vel"].append(y_vel_i)
+        self.robot_traject["theta_vel"].append(y_vel_i)
 
         # Joint States
         self.robot_traject["q1"].append(self._robot.get_q()[0])
@@ -623,7 +630,7 @@ class ManipulatorInterface(Interface):
         self.robot_traject["force"].append(repulsion_force)
         self.robot_traject["d_obs"].append(d_obs)
 
-        if(self._count > 1000):
+        if(self._count > 400):
             # Plot
             plt.figure()
             plt.subplot(2, 1, 1).set_title("X Position")
@@ -747,7 +754,9 @@ class ManipulatorInterface(Interface):
         return np.array([theta_i, x_i, y_i])
     
     def get_end_effector_velocity_2D(self, link: str = "ee") -> np.ndarray:
-        [theta_vel, x_vel, y_vel] = self._robot.get_link_jacobian(link)[2:5, :] @ self._robot.get_q_dot()
+        j = self._robot.get_link_jacobian(link)[2:5, :]
+        q_dot = self._robot.get_q_dot()
+        [theta_vel, x_vel, y_vel] = j @ q_dot
         return np.array([theta_vel, x_vel, y_vel])
     
     def get_ee_projected_on_obstacle(self):
