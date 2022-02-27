@@ -120,7 +120,7 @@ class WBC(object):
                 task.debug()
 
             ## TODO : Iterate through all tasks and construct cost_t_mat, cost_t_vec
-            __import__('ipdb').set_trace()
+            # __import__('ipdb').set_trace()
 
         cost_t_mat += self._lambda_q_ddot * self._mass_matrix  ## qddot regularization
 
@@ -166,14 +166,14 @@ class WBC(object):
 
         if contact_list is not None:
             # TODO : Construct floating base dynamics constraint matrix
-            __import__('ipdb').set_trace()
+            # __import__('ipdb').set_trace()
             eq_mat = np.zeros(
                 (6, contact_jacobian.transpose().shape[1] + self._n_q_dot))
 
         else:
             eq_mat = np.dot(self._sf, self._mass_matrix)
         # TODO : Construct floating base dynamics constraint vector
-        __import__('ipdb').set_trace()
+        # __import__('ipdb').set_trace()
         eq_vec = np.zeros(6)
 
         # ======================================================================
