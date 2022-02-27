@@ -4,8 +4,9 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
-            "name": "HCR HW1",
+            "name": "HW1",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/hw1/simulator/pybullet/manipulator_main.py",
@@ -14,14 +15,23 @@
             "cwd": "${workspaceFolder}/hw1"
         },
         {
-            "name": "HCR HW1 Profiling",
+            "name": "HW2",
             "type": "python",
             "request": "launch",
-            "module": "cProfile",
-            "args": ["${workspaceFolder}/hw1/simulator/pybullet/manipulator_main.py"],
+            "program": "${workspaceFolder}/hw2/simulator/pybullet/atlas_main.py",
             "console": "integratedTerminal",
-            "python": "/home/jwilson/anaconda3/envs/hw1/bin/python",
-            "cwd": "${workspaceFolder}/hw1"
-        }
+            "python": "/home/jwilson/anaconda3/envs/hw2/bin/python",
+            "cwd": "${workspaceFolder}/hw2"
+        },
+        // {
+        //     "name": "HCR HW1 Profiling",
+        //     "type": "python",
+        //     "request": "launch",
+        //     "module": "cProfile",
+        //     "args": ["${workspaceFolder}/hw1/simulator/pybullet/manipulator_main.py"],
+        //     "console": "integratedTerminal",
+        //     "python": "/home/jwilson/anaconda3/envs/hw1/bin/python",
+        //     "cwd": "${workspaceFolder}/hw1"
+        // }
     ]
 }
