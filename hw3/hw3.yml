@@ -1,0 +1,18 @@
+name: hw2
+channels:
+  - conda-forge
+dependencies:
+  - pip
+  - pinocchio=2.5.5
+  - python=3.9.1
+  - pip:
+      - certifi==2020.12.5
+      - conda-env-export==0.4.3
+      - ipdb==0.13.4
+      - meshcat==0.0.19
+      - pybullet==3.0.8
+      - qpsolvers==1.5
+      - scipy==1.6.0
+      - wheel==0.36.2
+      - yapf==0.30.0
+prefix: /opt/anaconda3/envs/hw2
