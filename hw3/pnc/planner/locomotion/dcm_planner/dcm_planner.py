@@ -428,22 +428,22 @@ class DCMPlanner(object):
         if step_idx == 0:
             return self._ini_dcm_pos
         ## TODO
-        dcm_ini_ds = np.zeros(3)
+        dcm_ini_ds = self._vrp_list[step_idx-1]*(1 - np.exp(-t_ds_ini / self._b)) + self._dcm_ini_list[step_idx]*np.exp(-t_ds_ini / self._b)
         return dcm_ini_ds
 
     def _compute_dcm_vel_ini_ds(self, step_idx, t_ds_ini):
         if step_idx == 0:
             return self._ini_dcm_vel
         ## TODO
-        dcm_vel_ini_ds = np.zeros(3)
+        dcm_vel_ini_des = (self._dcm_ini_ds_list[step_idx] - self._vrp_list[step_idx-1])/self._b
         return dcm_vel_ini_des
 
     def _compute_dcm_acc_ini_ds(self, step_idx, t_ds_ini):
         if step_idx == 0:
             return np.zeros(3)
         ## TODO
-        dcm_acc_ini_des = np.zeros(3)
-        return dcm_acc_ini_des
+        dcm_acc_ini_ds = self._dcm_vel_ini_ds_list[step_idx]/self._b
+        return dcm_acc_ini_ds
 
     def _compute_dcm_end_ds(self, step_idx, t_ds_end):
         if step_idx == len(self._vrp_list) - 1:
@@ -452,7 +452,7 @@ class DCMPlanner(object):
             return self._dcm_end_ds_list[step_idx + 1]
         else:
             ## TODO
-            dcm_end_ds = np.zeros(3)
+            dcm_end_ds = self._vrp_list[step_idx]*(1 - np.exp(-t_ds_end / self._b)) + self._dcm_ini_list[step_idx]*np.exp(-t_ds_end / self._b)
             return dcm_end_ds
 
     def _compute_dcm_vel_end_ds(self, step_idx, t_ds_end):
@@ -462,7 +462,7 @@ class DCMPlanner(object):
             return self._dcm_vel_end_ds_list[step_idx + 1]
         else:
             ## TODO
-            dcm_vel_end_ds = np.zeros(3)
+            dcm_vel_end_ds = (self._dcm_end_ds_list[step_idx] - self._vrp_list[step_idx])/self._b
             return dcm_vel_end_ds
 
     def _compute_dcm_acc_end_ds(self, step_idx, t_ds_end):
@@ -472,8 +472,8 @@ class DCMPlanner(object):
             return self._dcm_acc_end_ds_list[step_idx + 1]
         else:
             ## TODO
-            dcm_acc_end_ds = np.zeros(3)
-            return dcm_acc_end_des
+            dcm_acc_end_ds = self._dcm_vel_ini_ds_list[step_idx]/self._b
+            return dcm_acc_end_ds
 
     def _compute_t_step(self, step_idx):
         if self._vrp_type_list[step_idx] == VRPType.TRANSFER:
@@ -489,7 +489,7 @@ class DCMPlanner(object):
 
     def _compute_dcm_ini(self, vrp_d_i, t_step, dcm_eos_i):
         ## TODO
-        dcm_ini = np.zeros(3)
+        dcm_ini = vrp_d_i*(1 - np.exp(-t_step / self._b)) + dcm_eos_i*np.exp(-t_step / self._b)
         return dcm_ini
 
     @property
