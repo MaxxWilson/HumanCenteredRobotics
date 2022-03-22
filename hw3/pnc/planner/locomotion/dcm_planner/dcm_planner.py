@@ -428,7 +428,7 @@ class DCMPlanner(object):
         if step_idx == 0:
             return self._ini_dcm_pos
         ## TODO
-        dcm_ini_ds = self._vrp_list[step_idx-1]*(1 - np.exp(-t_ds_ini / self._b)) + self._dcm_ini_list[step_idx]*np.exp(-t_ds_ini / self._b)
+        dcm_ini_ds = self._vrp_list[step_idx-1]*(1 - np.exp(-t_ds_ini / self._b)) + self._dcm_eos_list[step_idx-1]*np.exp(-t_ds_ini / self._b)
         return dcm_ini_ds
 
     def _compute_dcm_vel_ini_ds(self, step_idx, t_ds_ini):
@@ -452,7 +452,7 @@ class DCMPlanner(object):
             return self._dcm_end_ds_list[step_idx + 1]
         else:
             ## TODO
-            dcm_end_ds = self._vrp_list[step_idx]*(1 - np.exp(-t_ds_end / self._b)) + self._dcm_ini_list[step_idx]*np.exp(-t_ds_end / self._b)
+            dcm_end_ds = self._vrp_list[step_idx]*(1 - np.exp(t_ds_end / self._b)) + self._dcm_ini_list[step_idx]*np.exp(t_ds_end / self._b)
             return dcm_end_ds
 
     def _compute_dcm_vel_end_ds(self, step_idx, t_ds_end):
@@ -472,7 +472,7 @@ class DCMPlanner(object):
             return self._dcm_acc_end_ds_list[step_idx + 1]
         else:
             ## TODO
-            dcm_acc_end_ds = self._dcm_vel_ini_ds_list[step_idx]/self._b
+            dcm_acc_end_ds = self._dcm_vel_end_ds_list[step_idx]/self._b
             return dcm_acc_end_ds
 
     def _compute_t_step(self, step_idx):
