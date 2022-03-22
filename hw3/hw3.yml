@@ -1,4 +1,4 @@
-name: hw2
+name: hw3
 channels:
   - conda-forge
 dependencies:
@@ -15,4 +15,4 @@ dependencies:
       - scipy==1.6.0
       - wheel==0.36.2
       - yapf==0.30.0
-prefix: /opt/anaconda3/envs/hw2
+prefix: /opt/anaconda3/envs/hw3
