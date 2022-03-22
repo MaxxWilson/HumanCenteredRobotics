@@ -76,7 +76,7 @@ def save_trajectory(lf_stance, rf_stance, footstep_list, dcm_planner):
     if not os.path.exists('data'):
         os.makedirs('data')
 
-    file = open("data/dcm_planning.pkl", 'ab')
+    file = open("data/dcm_planning_backwards.pkl", 'ab')
     pickle.dump(data, file)
     file.close()
 
@@ -107,19 +107,19 @@ rf_stance.quat = np.array([0., 0., 0., 1.])
 rf_stance.side = Footstep.RIGHT_SIDE
 
 first_step = Footstep()
-first_step.pos = np.array([0.15, 0.11, 0.])
+first_step.pos = np.array([-0.15, -0.11, 0.])
 first_step.quat = np.array([0., 0., 0., 1.])
-first_step.side = Footstep.LEFT_SIDE
+first_step.side = Footstep.RIGHT_SIDE
 
 second_step = Footstep()
-second_step.pos = np.array([0.30, -0.11, 0.])
+second_step.pos = np.array([-0.30, 0.11, 0.])
 second_step.quat = np.array([0., 0., 0., 1.])
-second_step.side = Footstep.RIGHT_SIDE
+second_step.side = Footstep.LEFT_SIDE
 
 third_step = Footstep()
-third_step.pos = np.array([0.30, 0.11, 0.])
+third_step.pos = np.array([-0.30, -0.11, 0.])
 third_step.quat = np.array([0., 0., 0., 1.])
-third_step.side = Footstep.LEFT_SIDE
+third_step.side = Footstep.RIGHT_SIDE
 
 input_footstep_list = [first_step, second_step, third_step]
 
