@@ -27,7 +27,7 @@ class TaskHierarchyManager(object):
         """
         Problem #5
         ----------
-        Set proper value for self._task.w_hierarchy. You would lienarly
+        Set proper value for self._task.w_hierarchy. You would linearly
         interpolate the value such that the weight is self._w_starting at
         self._start_time, and the weight is self._w_min at self._start_time +
         self._duration.
@@ -44,7 +44,8 @@ class TaskHierarchyManager(object):
         self._w_min : Final time weight at self._start_time + self._duration
 
         """
-        self._task.w_hierarchy = 0.
+        s = (t - self._start_time)/self._duration
+        self._task.w_hierarchy = (1-s)*self._w_starting + s*self._w_min
 
     def update_ramp_to_max(self, current_time):
         t = np.clip(current_time, self._start_time,
@@ -69,4 +70,5 @@ class TaskHierarchyManager(object):
         self._w_max : Final time weight at self._start_time + self._duration
 
         """
-        self._task.w_hierarchy = 0.
+        s = (t - self._start_time)/self._duration
+        self._task.w_hierarchy = (1-s)*self._w_starting + s*self._w_max

@@ -64,13 +64,16 @@ class FootTrajectoryManager(object):
         self._target_id via self._robot.
         """
 
-        foot_pos_des = np.zeros(3)
-        foot_lin_vel_des = np.zeros(3)
+        pose = self._robot.get_link_iso(self._target_id)
+        twist = self._robot.get_link_vel(self._target_id)
+
+        foot_pos_des = pose[0:3, 3]
+        foot_lin_vel_des = twist[3:6]
         self._pos_task.update_desired(foot_pos_des, foot_lin_vel_des,
                                       np.zeros(3))
 
-        foot_rot_des = np.zeros(4)
-        foot_ang_vel_des = np.zeros(3)
+        foot_rot_des = util.rot_to_quat(pose[0:3, 0:3])
+        foot_ang_vel_des = twist[0:3]
         self._ori_task.update_desired(foot_rot_des, foot_ang_vel_des,
                                       np.zeros(3))
 
@@ -139,16 +142,27 @@ class FootTrajectoryManager(object):
         class and evaluate, evaluate_ang_vel, evaluate_ang_acc in
         HermiteCurveQuat class to query desired values.
         """
-        foot_pos_des = np.zeros(3)
-        foot_lin_vel_des = np.zeros(3)
-        foot_lin_acc_des = np.zeros(3)
+
+        # First half of swing
+        if((curr_time - self._swing_start_time) < 0.5 * self._swing_duration):
+            s_pos = (curr_time - self._swing_start_time)/(0.5*self._swing_duration)
+            foot_pos_des = self._pos_traj_init_to_mid.evaluate(s_pos)
+            foot_lin_vel_des = self._pos_traj_init_to_mid.evaluate_first_derivative(s_pos)
+            foot_lin_acc_des = self._pos_traj_init_to_mid.evaluate_second_derivative(s_pos)
+        else:
+            s_pos = (curr_time - self._swing_start_time)/(0.5*self._swing_duration) - 1
+            foot_pos_des = self._pos_traj_mid_to_end.evaluate(s_pos)
+            foot_lin_vel_des = self._pos_traj_mid_to_end.evaluate_first_derivative(s_pos)
+            foot_lin_acc_des = self._pos_traj_mid_to_end.evaluate_second_derivative(s_pos)
 
         self._pos_task.update_desired(foot_pos_des, foot_lin_vel_des,
                                       foot_lin_acc_des)
 
-        foot_quat_des = np.zeros(4)
-        foot_ang_vel_des = np.zeros(3)
-        foot_ang_acc_des = np.zeros(3)
+        s_quat = (curr_time - self._swing_start_time)/self._swing_duration
+
+        foot_quat_des = self._quat_hermite_curve.evaluate(s_quat)
+        foot_ang_vel_des = self._quat_hermite_curve.evaluate_first_derivative(s_quat)
+        foot_ang_acc_des = self._quat_hermite_curve.evaluate_second_derivative(s_quat)
 
         self._ori_task.update_desired(foot_quat_des, foot_ang_vel_des,
                                       foot_ang_acc_des)
