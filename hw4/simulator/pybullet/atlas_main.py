@@ -95,6 +95,40 @@ if __name__ == "__main__":
     dt = SimConfig.CONTROLLER_DT
     count = 0
 
+    # I use Windows Subsystem for Linux. My keyboard interrupts did not register in the terminal for some reason with pybullet.
+    # I made a ros2 topic because it was the fastest way to give this script inputs. Should still work normally.
+    ROS_INPUT=True
+    if(ROS_INPUT):
+        import threading
+        import rclpy
+        from std_msgs.msg._int32 import Int32
+
+        def callback(msg):
+            if msg.data == 8:
+                interface.interrupt_logic.b_interrupt_button_eight = True
+            elif msg.data == 5:
+                interface.interrupt_logic.b_interrupt_button_five = True
+            elif msg.data == 4:
+                interface.interrupt_logic.b_interrupt_button_four = True
+            elif msg.data == 2:
+                interface.interrupt_logic.b_interrupt_button_two = True
+            elif msg.data == 6:
+                interface.interrupt_logic.b_interrupt_button_six = True
+            elif msg.data == 7:
+                interface.interrupt_logic.b_interrupt_button_seven = True
+            elif msg.data == 9:
+                interface.interrupt_logic.b_interrupt_button_nine = True
+
+        rclpy.init()
+        node = rclpy.create_node("atlas_keyboard_sub")
+        node.create_subscription(Int32, "/AtlasKeyboard", callback, 10)
+
+        def ros_thread():
+            while(rclpy.ok()):
+                rclpy.spin(node)
+
+        threading.Thread(target=ros_thread, daemon=True).start()
+
     while (1):
 
         # Get SensorData
