@@ -161,8 +161,8 @@ class FootTrajectoryManager(object):
         s_quat = (curr_time - self._swing_start_time)/self._swing_duration
 
         foot_quat_des = self._quat_hermite_curve.evaluate(s_quat)
-        foot_ang_vel_des = self._quat_hermite_curve.evaluate_first_derivative(s_quat)
-        foot_ang_acc_des = self._quat_hermite_curve.evaluate_second_derivative(s_quat)
+        foot_ang_vel_des = self._quat_hermite_curve.evaluate_ang_vel(s_quat)
+        foot_ang_acc_des = self._quat_hermite_curve.evaluate_ang_acc(s_quat)
 
         self._ori_task.update_desired(foot_quat_des, foot_ang_vel_des,
                                       foot_ang_acc_des)
