@@ -98,7 +98,7 @@ if __name__ == "__main__":
     # I use Windows Subsystem for Linux. My keyboard interrupts did not register in the terminal for some reason with pybullet.
     # I made a ros2 topic because it was the fastest way to give this script inputs. Should still work normally.
     # ros2 topic pub /AtlasKeyboard std_msgs/msg/Int32 "{data: 9}" -t 1
-    ROS_INPUT=True
+    ROS_INPUT=False
     if(ROS_INPUT):
         import threading
         import rclpy

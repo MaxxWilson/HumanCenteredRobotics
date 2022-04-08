@@ -6,7 +6,6 @@ dependencies:
   - python=3.9.1
   - pip:
       - certifi==2020.12.5
-      - conda-env-export==0.2.2
       - imageio==2.9.0
       - ipdb==0.13.4
       - matplotlib==3.3.4
